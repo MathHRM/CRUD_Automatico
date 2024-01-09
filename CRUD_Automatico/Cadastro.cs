@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -10,26 +11,35 @@ namespace CRUD_Automatico
     {
         private MySqlConnection _conxSql = new MySqlConnection(BDInfo.Server);
 
+        private List<string> _colunas = new List<string>();
+        public List<string> Colunas { get { return _colunas; } }
+
+        public Cadastro()
+        {
+            GetColumnNames();
+        }
+
         public bool Adicionar(Dictionary<string, string> values)
         {
             try
             {
                 _conxSql.Open();
 
-                var colunas = GetColumnNames();
                 string colunasstr = "";
                 string colunasSet = "";
-                for (int i = 0; i < colunas.Count; i++)
+                for (int i = 0; i < _colunas.Count; i++)
                 {
-                    colunasstr += colunas[i];
-                    colunasSet += "@" + colunas[i];
+                    colunasstr += _colunas[i];
+                    colunasSet += "@" + _colunas[i];
 
-                    if (i < colunas.Count - 1)
+                    if (i < _colunas.Count - 1)
                     {
                         colunasstr += ", ";
                         colunasSet += ", ";
                     }
                 }
+                Console.WriteLine(colunasstr);
+                Console.WriteLine(colunasSet);
 
                 var comando = new MySqlCommand(
                     $"INSERT INTO {BDInfo.Table} ({colunasstr}) values ({colunasSet});", _conxSql);
@@ -37,7 +47,6 @@ namespace CRUD_Automatico
                 SetParametros(comando, values);
 
                 comando.ExecuteNonQuery();
-                _conxSql.Close();
                 return true;
             }
             catch (Exception ex)
@@ -60,11 +69,10 @@ namespace CRUD_Automatico
                 _conxSql.Open();
 
                 string set = "";
-                var colunas = GetColumnNames();
-                for (int i = 0; i < colunas.Count; i++)
+                for (int i = 0; i < Colunas.Count; i++)
                 {
-                    set += $"{colunas[i]} = @{colunas[i]}";
-                    if (i < colunas.Count - 1) set += ", ";
+                    set += $"{Colunas[i]} = @{Colunas[i]}";
+                    if (i < Colunas.Count - 1) set += ", ";
                 }
 
                 var comando = new MySqlCommand(
@@ -90,7 +98,7 @@ namespace CRUD_Automatico
 
         private void SetParametros(MySqlCommand comando, Dictionary<string, string> values)
         {
-            GetColumnNames().ForEach(c =>
+            Colunas.ForEach(c =>
             {
                 var column = $"@{c}";
                 comando.Parameters.Add(column, MySqlDbType.VarChar, 50);
@@ -161,17 +169,14 @@ namespace CRUD_Automatico
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pesquisar do BD" + ex.Message);
-                return null;
-            }
-            finally
-            {
                 _conxSql.Close();
+                return null;
             }
         }
 
 
 
-        public List<string> GetColumnNames()
+        private void GetColumnNames()
         {
             List<string> lista = new List<string>();
             DataTable schema = null;
@@ -179,11 +184,17 @@ namespace CRUD_Automatico
             try
             {
                 _conxSql.Open();
+                
                 var schemaCommand = new MySqlCommand(
                     $"SELECT * FROM {BDInfo.Table}", _conxSql);
 
                 var reader = schemaCommand.ExecuteReader(CommandBehavior.SchemaOnly);
                 schema = reader.GetSchemaTable();
+
+                foreach (DataRow col in schema.Rows)
+                {
+                    _colunas.Add(col.Field<String>("ColumnName"));
+                }
             }
             catch (Exception ex)
             {
@@ -193,13 +204,6 @@ namespace CRUD_Automatico
             {
                 _conxSql.Close();
             }
-
-            foreach (DataRow col in schema.Rows)
-            {
-                lista.Add(col.Field<String>("ColumnName"));
-            }
-
-            return lista;
         }
 
 

@@ -15,8 +15,9 @@ namespace CRUD_Automatico
         public Form1()
         {
             InitializeComponent();
-
-            //setAllInputs();
+            var testaConexao = new Cadastro();
+            testaConexao.TestaConexao();
+            setAllInputs();
             ShowAll();
         }
 
@@ -30,7 +31,7 @@ namespace CRUD_Automatico
         private void setAllInputs()
         {
             Cadastro c = new Cadastro();
-            var colunas = c.GetColumnNames();
+            var colunas = c.Colunas;
 
             foreach (var col in colunas)
             {
@@ -52,7 +53,7 @@ namespace CRUD_Automatico
 
         private void inptAdicionar_Click(object sender, EventArgs e)
         {
-            /*var values = new Dictionary<string, string>();
+            var values = new Dictionary<string, string>();
             Cadastro adicionar;
 
             if (!validadeInputs())
@@ -68,7 +69,7 @@ namespace CRUD_Automatico
 
             adicionar = new Cadastro();
             adicionar.Adicionar(values);
-            ShowAll();*/
+            ShowAll();
         }
 
         private bool validadeInputs()
