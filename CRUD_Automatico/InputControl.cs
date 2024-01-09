@@ -19,29 +19,36 @@ namespace CRUD_Automatico
 
         public bool isId { get; } 
 
-        public InputControl(string col)
+        public InputControl(string col, bool isId)
         {
             InitializeComponent();
-            if (isIdColumn(col)){
-                filterId();
-                isId = true;
-            }
+            this.isId = isId;
+
+            if(isId)
+                setReadOnly(true);
+
             lbl.Text = col;
             _colRef = col;
-        }
-
-        private bool isIdColumn(string col)
-        {
-            string id = col.ToLower();
-            return col.Equals("id") ||
-                   col.Contains("_id") ||
-                   col.Contains("id_");
         }
 
         public void filterId()
         {
             inpt.BackColor = Color.LightGray;
             inpt.ReadOnly = true;
+        }
+
+        public void setReadOnly(bool b)
+        {
+            if(b) 
+            {
+                inpt.BackColor = Color.LightGray;
+                inpt.ReadOnly = true;
+            }
+            else
+            {
+                inpt.BackColor = Color.White;
+                inpt.ReadOnly = false;
+            }
         }
     }
 }

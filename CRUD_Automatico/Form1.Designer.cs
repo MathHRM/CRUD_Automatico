@@ -31,6 +31,8 @@
             this.dataGD = new System.Windows.Forms.DataGridView();
             this.inptPainel = new System.Windows.Forms.FlowLayoutPanel();
             this.inptAdicionar = new System.Windows.Forms.Button();
+            this.inptPesquisar = new System.Windows.Forms.Button();
+            this.inptConfirmarPesquisa = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,11 +62,33 @@
             this.inptAdicionar.UseVisualStyleBackColor = true;
             this.inptAdicionar.Click += new System.EventHandler(this.inptAdicionar_Click);
             // 
+            // inptPesquisar
+            // 
+            this.inptPesquisar.Location = new System.Drawing.Point(263, 223);
+            this.inptPesquisar.Name = "inptPesquisar";
+            this.inptPesquisar.Size = new System.Drawing.Size(75, 23);
+            this.inptPesquisar.TabIndex = 3;
+            this.inptPesquisar.Text = "Pesquisar";
+            this.inptPesquisar.UseVisualStyleBackColor = true;
+            this.inptPesquisar.Click += new System.EventHandler(this.inptPesquisar_Click);
+            // 
+            // inptConfirmarPesquisa
+            // 
+            this.inptConfirmarPesquisa.Location = new System.Drawing.Point(637, 240);
+            this.inptConfirmarPesquisa.Name = "inptConfirmarPesquisa";
+            this.inptConfirmarPesquisa.Size = new System.Drawing.Size(75, 23);
+            this.inptConfirmarPesquisa.TabIndex = 4;
+            this.inptConfirmarPesquisa.Text = "Confirmar";
+            this.inptConfirmarPesquisa.UseVisualStyleBackColor = true;
+            this.inptConfirmarPesquisa.Click += new System.EventHandler(this.inptConfirmarPesquisa_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(724, 450);
+            this.Controls.Add(this.inptConfirmarPesquisa);
+            this.Controls.Add(this.inptPesquisar);
             this.Controls.Add(this.inptAdicionar);
             this.Controls.Add(this.inptPainel);
             this.Controls.Add(this.dataGD);
@@ -81,6 +105,8 @@
         private System.Windows.Forms.DataGridView dataGD;
         private System.Windows.Forms.FlowLayoutPanel inptPainel;
         private System.Windows.Forms.Button inptAdicionar;
+        private System.Windows.Forms.Button inptPesquisar;
+        private System.Windows.Forms.Button inptConfirmarPesquisa;
     }
 }
 

@@ -32,10 +32,11 @@ namespace CRUD_Automatico
         {
             Cadastro c = new Cadastro();
             var colunas = c.Colunas;
+            var nomeColunas = c.NomeColunas;
 
-            foreach (var col in colunas)
+            foreach (var col in nomeColunas)
             {
-                var input = new InputControl(col);
+                var input = new InputControl(col, colunas[col].Equals("PRIMARY KEY"));
 
                 inptPainel.Controls.Add(input);
             }
@@ -58,7 +59,7 @@ namespace CRUD_Automatico
             var values = new Dictionary<string, string>();
             Cadastro adicionar;
 
-            if (!validadeInputs())
+            if (!inputsPreenchidos())
             {
                 MessageBox.Show("Preencha todos os inputs");
                 return;
@@ -73,9 +74,10 @@ namespace CRUD_Automatico
             adicionar = new Cadastro();
             adicionar.Adicionar(values);
             ShowAll();
+            limparInputs();
         }
 
-        private bool validadeInputs()
+        private bool inputsPreenchidos()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
@@ -83,6 +85,62 @@ namespace CRUD_Automatico
                     if (i.Value == string.Empty) return false;
             }
             return true;
+        }
+
+        private void limparInputs()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                i.Input.Text = string.Empty;
+            }
+        }
+
+        private void inptPesquisar_Click(object sender, EventArgs e)
+        {
+            foreach( InputControl i in inptPainel.Controls)
+            {
+                i.setReadOnly(!i.isId);
+            }
+            inptPesquisar.Enabled = false;
+            inptConfirmarPesquisa.Enabled = true;
+        }
+
+        private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
+        {
+            Cadastro p = new Cadastro();
+            string strId = "";
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                if (i.isId) strId = i.Input.Text;
+            }
+
+            if (strId == string.Empty)
+            {
+                MessageBox.Show("Digite um id");
+                return;
+            }
+
+            int id = int.Parse(strId);
+            var resultado = p.Pesquisar(id);
+
+            if (resultado == null)
+            {
+                MessageBox.Show("Funcionario não encontrado: não existe");
+                return;
+            }
+
+            if (!resultado.HasRows)
+            {
+                MessageBox.Show("Funcionario não encontrado: sem dados");
+                return;
+            }
+
+            resultado.Read();
+
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                i.Input.Text = resultado[i.Column].ToString();
+            }
         }
     }
 }

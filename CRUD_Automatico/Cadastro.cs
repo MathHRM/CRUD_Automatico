@@ -11,12 +11,19 @@ namespace CRUD_Automatico
     {
         private MySqlConnection _conxSql = new MySqlConnection(BDInfo.Server);
 
-        private List<string> _colunas = new List<string>();
-        public List<string> Colunas { get { return _colunas; } }
+        private Dictionary<string, string> _colunas = new Dictionary<string, string>();
+
+        public Dictionary<string, string> Colunas { get { return _colunas; } }
+
+        private List<string> _nomeColunas;
+        public List<string> NomeColunas { get { return _nomeColunas; } }
+        private string _id;
+        public string ID { get { return _id; } }
 
         public Cadastro()
         {
-            GetColumnNames();
+            GetColumn();
+            _nomeColunas = new List<string>(_colunas.Keys);
         }
 
         public bool Adicionar(Dictionary<string, string> values)
@@ -27,13 +34,14 @@ namespace CRUD_Automatico
 
                 string colunasstr = "";
                 string colunasSet = "";
-                for (int i = 0; i < _colunas.Count; i++)
+                for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (verifyColId(_colunas[i])) continue;
-                    colunasstr += _colunas[i];
-                    colunasSet += "@" + _colunas[i];
+                    if (verifyColId(_nomeColunas[i])) continue;
 
-                    if (i < _colunas.Count - 1)
+                    colunasstr += _nomeColunas[i];
+                    colunasSet += "@" + _nomeColunas[i];
+
+                    if (i < _nomeColunas.Count - 1)
                     {
                         colunasstr += ", ";
                         colunasSet += ", ";
@@ -52,7 +60,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao adicionar ao BD\n" + ex.Message);
+                Console.WriteLine("Erro ao adicionar ao BD\n\n" + ex.Message);
                 return false;
             }
             finally
@@ -70,10 +78,11 @@ namespace CRUD_Automatico
                 _conxSql.Open();
 
                 string set = "";
-                for (int i = 0; i < Colunas.Count; i++)
+                for (int i = 0; i < NomeColunas.Count; i++)
                 {
-                    set += $"{Colunas[i]} = @{Colunas[i]}";
-                    if (i < Colunas.Count - 1) set += ", ";
+                    if (_nomeColunas[i].Equals(_id)) continue;
+                    set += $"{NomeColunas[i]} = @{NomeColunas[i]}";
+                    if (i < NomeColunas.Count - 1) set += ", ";
                 }
 
                 var comando = new MySqlCommand(
@@ -87,7 +96,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao adicionar ao BD\n" + ex.Message);
+                Console.WriteLine("Erro ao adicionar ao BD\n\n" + ex.Message);
                 return false;
             }
             finally
@@ -101,11 +110,11 @@ namespace CRUD_Automatico
         {
             for (int i = 0; i < Colunas.Count; i++)
             {
-                if (verifyColId(_colunas[i])) continue;
+                if (_nomeColunas[i].Equals(_id)) continue;
 
-                var column = $"@{_colunas[i]}";
+                var column = $"@{_nomeColunas[i]}";
                 comando.Parameters.Add(column, MySqlDbType.VarChar, 50);
-                comando.Parameters[column].Value = values[_colunas[i]];
+                comando.Parameters[column].Value = values[_nomeColunas[i]];
             }
         }
 
@@ -122,7 +131,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao remover do BD" + ex.Message);
+                Console.WriteLine("Erro ao remover do BD\n" + ex.Message);
             }
             finally
             {
@@ -138,20 +147,18 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"SELECT * FROM {BDInfo.Table} WHERE id = {ID};", _conxSql);
+                    $"SELECT * FROM {BDInfo.Table} WHERE {getColumnId()} = {ID};", _conxSql);
 
                 var reader = comando.ExecuteReader();
+                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE {getColumnId()} = {ID};");
 
                 return reader;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro aoremover do BD" + ex.Message);
-                return null;
-            }
-            finally
-            {
+                Console.WriteLine("Erro ao remover do BD\n" + ex.Message);
                 _conxSql.Close();
+                return null;
             }
         }
 
@@ -171,7 +178,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao pesquisar do BD" + ex.Message);
+                Console.WriteLine("Erro ao pesquisar do BD\n" + ex.Message);
                 _conxSql.Close();
                 return null;
             }
@@ -179,7 +186,7 @@ namespace CRUD_Automatico
 
 
 
-        private void GetColumnNames()
+        private void GetColumn()
         {
             List<string> lista = new List<string>();
             DataTable schema = null;
@@ -196,12 +203,18 @@ namespace CRUD_Automatico
 
                 foreach (DataRow col in schema.Rows)
                 {
-                    _colunas.Add(col.Field<String>("ColumnName"));
+                    string constraint = "";
+                    if (col.Field<Boolean>("IsKey"))
+                    {
+                        _id = col.Field<String>("ColumnName");
+                        constraint = "PRIMARY KEY";
+                    }
+                    _colunas.Add(col.Field<String>("ColumnName"), constraint);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao pegar colunas do BD" + ex.Message);
+                Console.WriteLine("Erro ao pegar colunas do BD\n" + ex.Message);
             }
             finally
             {
@@ -221,7 +234,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao conectar ao BD" + ex.Message);
+                MessageBox.Show("Erro ao conectar ao BD\n" + ex.Message);
                 return false;
             }
             finally
@@ -236,6 +249,15 @@ namespace CRUD_Automatico
             return col.Equals("id") ||
                    col.Contains("_id") ||
                    col.Contains("id_");
+        }
+
+        private string getColumnId()
+        {
+            foreach (var item in _nomeColunas)
+            {
+                if (verifyColId(item)) return item;
+            }
+            return "";
         }
     }
 }
