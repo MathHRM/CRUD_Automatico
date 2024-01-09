@@ -35,7 +35,9 @@ namespace CRUD_Automatico
 
             foreach (var col in colunas)
             {
-                inptPainel.Controls.Add(new InputControl(col));
+                var input = new InputControl(col);
+
+                inptPainel.Controls.Add(input);
             }
         }
 
@@ -64,7 +66,8 @@ namespace CRUD_Automatico
 
             foreach (InputControl i in inptPainel.Controls)
             {
-                values.Add(i.Column, i.Value);
+                if (!i.isId)
+                    values.Add(i.Column, i.Value);
             }
 
             adicionar = new Cadastro();
@@ -76,7 +79,8 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if(i.Value == string.Empty) return false;
+                if(!i.isId)
+                    if (i.Value == string.Empty) return false;
             }
             return true;
         }

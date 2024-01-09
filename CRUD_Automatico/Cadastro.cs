@@ -29,6 +29,7 @@ namespace CRUD_Automatico
                 string colunasSet = "";
                 for (int i = 0; i < _colunas.Count; i++)
                 {
+                    if (verifyColId(_colunas[i])) continue;
                     colunasstr += _colunas[i];
                     colunasSet += "@" + _colunas[i];
 
@@ -98,12 +99,14 @@ namespace CRUD_Automatico
 
         private void SetParametros(MySqlCommand comando, Dictionary<string, string> values)
         {
-            Colunas.ForEach(c =>
+            for (int i = 0; i < Colunas.Count; i++)
             {
-                var column = $"@{c}";
+                if (verifyColId(_colunas[i])) continue;
+
+                var column = $"@{_colunas[i]}";
                 comando.Parameters.Add(column, MySqlDbType.VarChar, 50);
-                comando.Parameters[column].Value = values[c];
-            });
+                comando.Parameters[column].Value = values[_colunas[i]];
+            }
         }
 
 
@@ -225,6 +228,14 @@ namespace CRUD_Automatico
             {
                 _conxSql.Close();
             }
+        }
+
+        private bool verifyColId(string col)
+        {
+            string id = col.ToLower();
+            return col.Equals("id") ||
+                   col.Contains("_id") ||
+                   col.Contains("id_");
         }
     }
 }
