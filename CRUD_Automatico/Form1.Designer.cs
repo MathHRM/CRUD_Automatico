@@ -33,15 +33,18 @@
             this.inptAdicionar = new System.Windows.Forms.Button();
             this.inptPesquisar = new System.Windows.Forms.Button();
             this.inptConfirmarPesquisa = new System.Windows.Forms.Button();
-            this.btnEditar = new System.Windows.Forms.Button();
-            this.btnRemover = new System.Windows.Forms.Button();
+            this.inptEditar = new System.Windows.Forms.Button();
+            this.inptRemover = new System.Windows.Forms.Button();
+            this.inptConfirmarEdicao = new System.Windows.Forms.Button();
+            this.inptCancelar = new System.Windows.Forms.Button();
+            this.inptConfirmarRemover = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGD
             // 
             this.dataGD.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGD.Location = new System.Drawing.Point(12, 269);
+            this.dataGD.Location = new System.Drawing.Point(12, 298);
             this.dataGD.Name = "dataGD";
             this.dataGD.Size = new System.Drawing.Size(700, 169);
             this.dataGD.TabIndex = 0;
@@ -57,7 +60,7 @@
             // 
             // inptAdicionar
             // 
-            this.inptAdicionar.Location = new System.Drawing.Point(12, 223);
+            this.inptAdicionar.Location = new System.Drawing.Point(12, 269);
             this.inptAdicionar.Name = "inptAdicionar";
             this.inptAdicionar.Size = new System.Drawing.Size(75, 23);
             this.inptAdicionar.TabIndex = 2;
@@ -67,7 +70,7 @@
             // 
             // inptPesquisar
             // 
-            this.inptPesquisar.Location = new System.Drawing.Point(255, 223);
+            this.inptPesquisar.Location = new System.Drawing.Point(255, 269);
             this.inptPesquisar.Name = "inptPesquisar";
             this.inptPesquisar.Size = new System.Drawing.Size(75, 23);
             this.inptPesquisar.TabIndex = 3;
@@ -77,7 +80,7 @@
             // 
             // inptConfirmarPesquisa
             // 
-            this.inptConfirmarPesquisa.Location = new System.Drawing.Point(637, 240);
+            this.inptConfirmarPesquisa.Location = new System.Drawing.Point(637, 269);
             this.inptConfirmarPesquisa.Name = "inptConfirmarPesquisa";
             this.inptConfirmarPesquisa.Size = new System.Drawing.Size(75, 23);
             this.inptConfirmarPesquisa.TabIndex = 4;
@@ -85,31 +88,65 @@
             this.inptConfirmarPesquisa.UseVisualStyleBackColor = true;
             this.inptConfirmarPesquisa.Click += new System.EventHandler(this.inptConfirmarPesquisa_Click);
             // 
-            // btnEditar
+            // inptEditar
             // 
-            this.btnEditar.Location = new System.Drawing.Point(93, 223);
-            this.btnEditar.Name = "btnEditar";
-            this.btnEditar.Size = new System.Drawing.Size(75, 23);
-            this.btnEditar.TabIndex = 5;
-            this.btnEditar.Text = "Editar";
-            this.btnEditar.UseVisualStyleBackColor = true;
+            this.inptEditar.Location = new System.Drawing.Point(93, 269);
+            this.inptEditar.Name = "inptEditar";
+            this.inptEditar.Size = new System.Drawing.Size(75, 23);
+            this.inptEditar.TabIndex = 5;
+            this.inptEditar.Text = "Editar";
+            this.inptEditar.UseVisualStyleBackColor = true;
+            this.inptEditar.Click += new System.EventHandler(this.inptEditar_Click);
             // 
-            // btnRemover
+            // inptRemover
             // 
-            this.btnRemover.Location = new System.Drawing.Point(174, 223);
-            this.btnRemover.Name = "btnRemover";
-            this.btnRemover.Size = new System.Drawing.Size(75, 23);
-            this.btnRemover.TabIndex = 6;
-            this.btnRemover.Text = "Remover";
-            this.btnRemover.UseVisualStyleBackColor = true;
+            this.inptRemover.Location = new System.Drawing.Point(174, 269);
+            this.inptRemover.Name = "inptRemover";
+            this.inptRemover.Size = new System.Drawing.Size(75, 23);
+            this.inptRemover.TabIndex = 6;
+            this.inptRemover.Text = "Remover";
+            this.inptRemover.UseVisualStyleBackColor = true;
+            this.inptRemover.Click += new System.EventHandler(this.inptRemover_Click);
+            // 
+            // inptConfirmarEdicao
+            // 
+            this.inptConfirmarEdicao.Location = new System.Drawing.Point(637, 240);
+            this.inptConfirmarEdicao.Name = "inptConfirmarEdicao";
+            this.inptConfirmarEdicao.Size = new System.Drawing.Size(75, 23);
+            this.inptConfirmarEdicao.TabIndex = 7;
+            this.inptConfirmarEdicao.Text = "Confirmar";
+            this.inptConfirmarEdicao.UseVisualStyleBackColor = true;
+            this.inptConfirmarEdicao.Click += new System.EventHandler(this.confirmarEdicao_Click);
+            // 
+            // inptCancelar
+            // 
+            this.inptCancelar.Location = new System.Drawing.Point(475, 269);
+            this.inptCancelar.Name = "inptCancelar";
+            this.inptCancelar.Size = new System.Drawing.Size(75, 23);
+            this.inptCancelar.TabIndex = 8;
+            this.inptCancelar.Text = "Cancelar";
+            this.inptCancelar.UseVisualStyleBackColor = true;
+            this.inptCancelar.Click += new System.EventHandler(this.inptCancelar_Click);
+            // 
+            // inptConfirmarRemover
+            // 
+            this.inptConfirmarRemover.Location = new System.Drawing.Point(556, 269);
+            this.inptConfirmarRemover.Name = "inptConfirmarRemover";
+            this.inptConfirmarRemover.Size = new System.Drawing.Size(75, 23);
+            this.inptConfirmarRemover.TabIndex = 9;
+            this.inptConfirmarRemover.Text = "Excluir";
+            this.inptConfirmarRemover.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(724, 450);
-            this.Controls.Add(this.btnRemover);
-            this.Controls.Add(this.btnEditar);
+            this.ClientSize = new System.Drawing.Size(724, 479);
+            this.Controls.Add(this.inptConfirmarRemover);
+            this.Controls.Add(this.inptCancelar);
+            this.Controls.Add(this.inptConfirmarEdicao);
+            this.Controls.Add(this.inptRemover);
+            this.Controls.Add(this.inptEditar);
             this.Controls.Add(this.inptConfirmarPesquisa);
             this.Controls.Add(this.inptPesquisar);
             this.Controls.Add(this.inptAdicionar);
@@ -130,8 +167,11 @@
         private System.Windows.Forms.Button inptAdicionar;
         private System.Windows.Forms.Button inptPesquisar;
         private System.Windows.Forms.Button inptConfirmarPesquisa;
-        private System.Windows.Forms.Button btnEditar;
-        private System.Windows.Forms.Button btnRemover;
+        private System.Windows.Forms.Button inptEditar;
+        private System.Windows.Forms.Button inptRemover;
+        private System.Windows.Forms.Button inptConfirmarEdicao;
+        private System.Windows.Forms.Button inptCancelar;
+        private System.Windows.Forms.Button inptConfirmarRemover;
     }
 }
 

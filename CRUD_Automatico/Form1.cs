@@ -19,6 +19,11 @@ namespace CRUD_Automatico
             testaConexao.TestaConexao();
             setAllInputs();
             ShowAll();
+
+            inptCancelar.Visible = false;
+            inptConfirmarEdicao.Visible = false;
+            inptConfirmarPesquisa.Visible = false;
+            inptConfirmarRemover.Visible = false;
         }
 
 
@@ -118,6 +123,9 @@ namespace CRUD_Automatico
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
             pesquisar();
+
+            inptEditar.Visible = true;
+            inptConfirmarRemover.Visible = true;
         }
 
         private void pesquisar()
@@ -157,8 +165,12 @@ namespace CRUD_Automatico
                 i.Input.Text = resultado[i.Column].ToString();
             }
 
-            inptConfirmarPesquisa.Visible = false;
             desativarInputs();
+            desativarBotoes();
+            inptConfirmarPesquisa.Visible = false;
+            inptEditar.Visible = true;
+            inptCancelar.Visible = true;
+            inptConfirmarRemover.Visible = true;
         }
 
         private void desativarInputs()
@@ -173,13 +185,25 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.setReadOnly(false);
+                if (!i.isId)
+                    i.setReadOnly(false);
             }
         }
 
         private void desativarBotoes()
         {
+            inptAdicionar.Visible = false;
+            inptEditar.Visible = false;
+            inptRemover.Visible = false;
+            inptPesquisar.Visible = false;
+        }
 
+        private void ativarBotoes()
+        {
+            inptAdicionar.Visible = true;
+            inptEditar.Visible = true;
+            inptRemover.Visible = true;
+            inptPesquisar.Visible = true;
         }
 
         private void dataGD_SelectionChanged(object sender, EventArgs e)
@@ -201,6 +225,104 @@ namespace CRUD_Automatico
                     pesquisar();
                 }
             }
+        }
+
+        private void inptEditar_Click(object sender, EventArgs e)
+        {
+            if (isIdEmpty())
+            {
+                foreach (InputControl i in inptPainel.Controls)
+                {
+                    i.setReadOnly(!i.isId);
+                }
+                desativarBotoes();
+                inptConfirmarPesquisa.Visible = true;
+                inptCancelar.Visible = true;
+                return;
+            }
+
+            // caso clicado após uma pesquisa irá editar o resultado
+            desativarBotoes();
+            ativarInputs();
+
+            inptCancelar.Visible = true;
+            inptConfirmarRemover.Visible = false;
+            inptConfirmarEdicao.Visible = true;
+        }
+
+        private bool isIdEmpty()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                if (i.isId) return i.Input.Text == string.Empty;
+            }
+            return false;
+        }
+
+        private string idSelecionado()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                if (i.isId) return i.Input.Text;
+            }
+            return "";
+        }
+
+        private void confirmarEdicao_Click(object sender, EventArgs e)
+        {
+            var values = new Dictionary<string, string>();
+            string stringId = "";
+            Cadastro adicionar;
+
+            if (!inputsPreenchidos())
+            {
+                MessageBox.Show("Preencha todos os campos");
+                return;
+            }
+
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                if (!i.isId)
+                    values.Add(i.Column, i.Value);
+                else 
+                    stringId = i.Input.Text;
+            }
+
+
+            int id = int.Parse(stringId);
+
+            Cadastro update = new Cadastro();
+            bool atualizado = update.Update(values, id);
+
+            if (!atualizado)
+            {
+                MessageBox.Show("Funcionario não atualizado, verifique os dados ou tente novamente");
+                return;
+            }
+
+            inptConfirmarEdicao.Visible = false;
+            inptCancelar.Visible = false;
+
+            ativarBotoes();
+            limparInputs();
+            ShowAll();
+        }
+
+        private void inptCancelar_Click(object sender, EventArgs e)
+        {
+            ativarInputs();
+            ativarBotoes();
+            limparInputs();
+
+            inptConfirmarEdicao.Visible = false;
+            inptConfirmarPesquisa.Visible = false;
+            inptConfirmarRemover.Visible = false;
+            inptCancelar.Visible = false;
+        }
+
+        private void inptRemover_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
