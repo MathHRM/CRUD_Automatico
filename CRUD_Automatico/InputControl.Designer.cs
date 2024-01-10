@@ -28,16 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.inpt = new System.Windows.Forms.TextBox();
             this.lbl = new System.Windows.Forms.Label();
+            this.inpt = new System.Windows.Forms.MaskedTextBox();
             this.SuspendLayout();
-            // 
-            // inpt
-            // 
-            this.inpt.Location = new System.Drawing.Point(74, 3);
-            this.inpt.Name = "inpt";
-            this.inpt.Size = new System.Drawing.Size(194, 20);
-            this.inpt.TabIndex = 0;
             // 
             // lbl
             // 
@@ -49,12 +42,19 @@
             this.lbl.TabIndex = 1;
             this.lbl.Text = "label1";
             // 
+            // inpt
+            // 
+            this.inpt.Location = new System.Drawing.Point(59, 0);
+            this.inpt.Name = "inpt";
+            this.inpt.Size = new System.Drawing.Size(215, 20);
+            this.inpt.TabIndex = 2;
+            // 
             // InputControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.lbl);
             this.Controls.Add(this.inpt);
+            this.Controls.Add(this.lbl);
             this.Name = "InputControl";
             this.Size = new System.Drawing.Size(277, 32);
             this.ResumeLayout(false);
@@ -63,8 +63,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox inpt;
         private System.Windows.Forms.Label lbl;
+        private System.Windows.Forms.MaskedTextBox inpt;
     }
 }

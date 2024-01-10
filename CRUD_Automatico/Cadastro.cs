@@ -189,11 +189,17 @@ namespace CRUD_Automatico
                 foreach (DataRow col in schema.Rows)
                 {
                     string constraint = "";
-                    if (col.Field<Boolean>("IsKey"))
+                    if (col.Field<Boolean>("IsKey") && col.Field<Boolean>("IsAutoIncrement"))
                     {
                         _id = col.Field<String>("ColumnName");
-                        constraint = "PRIMARY KEY";
+                        constraint += "PRIMARY KEY";
                     }
+
+                    if (col.Field<Boolean>("IsReadOnly"))
+                        constraint += "READ ONLY";
+
+                    if(col.Field<Boolean>("AllowDBNull"))
+                        constraint += "NULLABLE";
 
                     _colunasAtrr.Add(col.Field<String>("ColumnName"), constraint);
                 }

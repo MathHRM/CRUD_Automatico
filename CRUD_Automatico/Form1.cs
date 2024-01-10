@@ -93,7 +93,7 @@ namespace CRUD_Automatico
                 if (!i.isId)
                     values.Add(i.Column, i.Value);
                 else
-                    stringId = i.Input.Text;
+                    stringId = i.Value;
             }
 
 
@@ -152,11 +152,7 @@ namespace CRUD_Automatico
 
             foreach (var nCol in nomeColunas)
             {
-                InputControl input;
-                if (!colunas[nCol].Equals("PRIMARY KEY"))
-                    input = new InputControl(nCol);
-                else
-                    input = new InputControl(nCol, true);
+                InputControl input = new InputControl(nCol, colunas[nCol]);
 
                 inptPainel.Controls.Add(input);
             }
@@ -179,7 +175,12 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    if (i.Value == string.Empty) return false;
+                {
+                    if (i.Value == string.Empty && i.IsNullable)
+                        return false;
+                    if (!i.MascaraCompleta)
+                        return false;
+                }
             }
             return true;
         }
@@ -188,7 +189,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.Input.Text = string.Empty;
+                i.Value = string.Empty;
             }
         }
 
@@ -232,7 +233,7 @@ namespace CRUD_Automatico
 
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.Input.Text = resultado[i.Column].ToString();
+                i.Value = resultado[i.Column].ToString();
             }
 
             desativarInputs();
@@ -257,7 +258,7 @@ namespace CRUD_Automatico
                     idSelecionado = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value.ToString();
                     foreach (InputControl i in inptPainel.Controls)
                     {
-                        if (i.isId) i.Input.Text = idSelecionado;
+                        if (i.isId) i.Value = idSelecionado;
                     }
                     pesquisar();
                 }
@@ -313,7 +314,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.Input.Text == string.Empty;
+                if (i.isId) return i.Value == string.Empty;
             }
             return false;
         }
@@ -322,7 +323,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.Input.Text;
+                if (i.isId) return i.Value;
             }
             return "";
         }

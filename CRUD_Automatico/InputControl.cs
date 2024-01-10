@@ -13,10 +13,18 @@ namespace CRUD_Automatico
     public partial class InputControl : UserControl
     {
         private string _colRef;
-        public string Value { get { return inpt.Text; } }
+        public string Value { 
+            get { return inpt.Text; }
+            set { inpt.Text = value; }
+        }
         public string Column { get { return _colRef; } }
-        public TextBox Input { get { return inpt; } } 
+        public MaskedTextBox Input { get { return inpt; } } 
         public bool isId { get; }
+
+        private bool _nullable = false;
+        public bool IsNullable { get { return _nullable; } }
+
+        public bool MascaraCompleta { get { return inpt.MaskFull; } }
 
 
         public InputControl(string col)
@@ -27,13 +35,23 @@ namespace CRUD_Automatico
             _colRef = col;
         }
 
-        public InputControl(string col, bool isId)
+        public InputControl(string col, string properties)
         {
             InitializeComponent();
-            this.isId = isId;
 
-            if(isId)
+            if (properties.Contains("PRIMARY KEY")) { 
+                this.isId = true; 
                 setReadOnly(true);
+            }
+
+            if (properties.Contains("NULLABLE"))
+                _nullable = true;
+
+            if (col.ToLower().Contains("cpf"))
+                inpt.Mask = "000.000.000-00";
+
+            if (col.ToLower().Contains("telefone"))
+                inpt.Mask = "(00) 0 0000-0000";
 
             lbl.Text = col;
             _colRef = col;
@@ -42,6 +60,11 @@ namespace CRUD_Automatico
         public void setReadOnly(bool enabled)
         {
             Input.Enabled = !enabled;
+        }
+
+        public void setMask(string mask)
+        {
+            inpt.Mask = mask;
         }
     }
 }
