@@ -36,7 +36,7 @@ namespace CRUD_Automatico
                 string colunasSet = "";
                 for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (verifyColId(_nomeColunas[i])) continue;
+                    if (_nomeColunas[i].Equals(_id)) continue;
 
                     colunasstr += _nomeColunas[i];
                     colunasSet += "@" + _nomeColunas[i];
@@ -86,7 +86,7 @@ namespace CRUD_Automatico
                 }
 
                 var comando = new MySqlCommand(
-                    $"UPDATE {BDInfo.Table} SET {set} WHERE id = {id};", _conxSql);
+                    $"UPDATE {BDInfo.Table} SET {set} WHERE {_id} = {id};", _conxSql);
 
                 SetParametros(comando, values);
 
@@ -147,10 +147,9 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"SELECT * FROM {BDInfo.Table} WHERE {getColumnId()} = {ID};", _conxSql);
+                    $"SELECT * FROM {BDInfo.Table} WHERE {_id} = {ID};", _conxSql);
 
                 var reader = comando.ExecuteReader();
-                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE {getColumnId()} = {ID};");
 
                 return reader;
             }
@@ -209,6 +208,7 @@ namespace CRUD_Automatico
                         _id = col.Field<String>("ColumnName");
                         constraint = "PRIMARY KEY";
                     }
+
                     _colunas.Add(col.Field<String>("ColumnName"), constraint);
                 }
             }
@@ -241,23 +241,6 @@ namespace CRUD_Automatico
             {
                 _conxSql.Close();
             }
-        }
-
-        private bool verifyColId(string col)
-        {
-            string id = col.ToLower();
-            return col.Equals("id") ||
-                   col.Contains("_id") ||
-                   col.Contains("id_");
-        }
-
-        private string getColumnId()
-        {
-            foreach (var item in _nomeColunas)
-            {
-                if (verifyColId(item)) return item;
-            }
-            return "";
         }
     }
 }

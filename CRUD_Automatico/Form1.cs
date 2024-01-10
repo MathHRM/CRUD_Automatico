@@ -34,9 +34,13 @@ namespace CRUD_Automatico
             var colunas = c.Colunas;
             var nomeColunas = c.NomeColunas;
 
-            foreach (var col in nomeColunas)
+            foreach (var nCol in nomeColunas)
             {
-                var input = new InputControl(col, colunas[col].Equals("PRIMARY KEY"));
+                InputControl input;
+                if (!colunas[nCol].Equals("PRIMARY KEY"))
+                    input = new InputControl(nCol);
+                else
+                    input = new InputControl(nCol, true);
 
                 inptPainel.Controls.Add(input);
             }
@@ -72,7 +76,13 @@ namespace CRUD_Automatico
             }
 
             adicionar = new Cadastro();
-            adicionar.Adicionar(values);
+            bool adicionado = adicionar.Adicionar(values);
+            if(!adicionado)
+            {
+                MessageBox.Show("Erro ao adicionar, verifique os dados e tente novamente");
+                return;
+            }
+
             ShowAll();
             limparInputs();
         }
@@ -108,19 +118,19 @@ namespace CRUD_Automatico
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
             Cadastro p = new Cadastro();
-            string strId = "";
-            foreach (InputControl i in inptPainel.Controls)
+            string stringId = "";
+            foreach (InputControl input in inptPainel.Controls)
             {
-                if (i.isId) strId = i.Input.Text;
+                if (input.isId) stringId = input.Input.Text;
             }
 
-            if (strId == string.Empty)
+            if (stringId == string.Empty)
             {
                 MessageBox.Show("Digite um id");
                 return;
             }
 
-            int id = int.Parse(strId);
+            int id = int.Parse(stringId);
             var resultado = p.Pesquisar(id);
 
             if (resultado == null)
@@ -140,6 +150,25 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.Input.Text = resultado[i.Column].ToString();
+            }
+
+            inptConfirmarPesquisa.Visible = false;
+            desativarInputs();
+        }
+
+        private void desativarInputs()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                i.setReadOnly(true);
+            }
+        }
+
+        private void ativarInputs()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                i.setReadOnly(false);
             }
         }
     }

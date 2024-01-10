@@ -17,8 +17,16 @@ namespace CRUD_Automatico
         public string Column { get { return _colRef; } }
         public TextBox Input { get { return inpt; } } 
 
-        public bool isId { get; } 
+        public bool isId { get; }
 
+
+        public InputControl(string col)
+        {
+            InitializeComponent();
+
+            lbl.Text = col;
+            _colRef = col;
+        }
         public InputControl(string col, bool isId)
         {
             InitializeComponent();
@@ -31,24 +39,9 @@ namespace CRUD_Automatico
             _colRef = col;
         }
 
-        public void filterId()
+        public void setReadOnly(bool enabled)
         {
-            inpt.BackColor = Color.LightGray;
-            inpt.ReadOnly = true;
-        }
-
-        public void setReadOnly(bool b)
-        {
-            if(b) 
-            {
-                inpt.BackColor = Color.LightGray;
-                inpt.ReadOnly = true;
-            }
-            else
-            {
-                inpt.BackColor = Color.White;
-                inpt.ReadOnly = false;
-            }
+            Input.Enabled = !enabled;
         }
     }
 }
