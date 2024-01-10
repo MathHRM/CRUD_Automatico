@@ -13,12 +13,16 @@ namespace CRUD_Automatico
     public partial class InputControl : UserControl
     {
         private string _colRef;
-        public string Value { 
+        public string Column { get { return _colRef; } }
+
+        public string Value
+        {
             get { return inpt.Text; }
             set { inpt.Text = value; }
         }
-        public string Column { get { return _colRef; } }
+
         public MaskedTextBox Input { get { return inpt; } } 
+
         public bool isId { get; }
 
         private bool _nullable = false;
