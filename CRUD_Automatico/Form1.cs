@@ -123,27 +123,19 @@ namespace CRUD_Automatico
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
             pesquisar();
-
-            inptEditar.Visible = true;
-            inptConfirmarRemover.Visible = true;
         }
 
         private void pesquisar()
         {
             Cadastro p = new Cadastro();
-            string stringId = "";
-            foreach (InputControl input in inptPainel.Controls)
-            {
-                if (input.isId) stringId = input.Input.Text;
-            }
 
-            if (stringId == string.Empty)
+            if (isIdEmpty())
             {
                 MessageBox.Show("Digite um id");
                 return;
             }
 
-            int id = int.Parse(stringId);
+            int id = int.Parse(idSelecionado());
             var resultado = p.Pesquisar(id);
 
             if (resultado == null)
@@ -231,13 +223,7 @@ namespace CRUD_Automatico
         {
             if (isIdEmpty())
             {
-                foreach (InputControl i in inptPainel.Controls)
-                {
-                    i.setReadOnly(!i.isId);
-                }
-                desativarBotoes();
-                inptConfirmarPesquisa.Visible = true;
-                inptCancelar.Visible = true;
+                modoPesquisa();
                 return;
             }
 
@@ -322,7 +308,37 @@ namespace CRUD_Automatico
 
         private void inptRemover_Click(object sender, EventArgs e)
         {
+            if (isIdEmpty())
+            {
+                modoPesquisa();
+                return;
+            }
+        }
 
+        private void modoPesquisa()
+        {
+            foreach (InputControl i in inptPainel.Controls)
+            {
+                i.setReadOnly(!i.isId);
+            }
+            desativarBotoes();
+            inptConfirmarPesquisa.Visible = true;
+            inptCancelar.Visible = true;
+        }
+
+        private void inptConfirmarRemover_Click(object sender, EventArgs e)
+        {
+            int id = int.Parse(idSelecionado());
+
+            Cadastro excluir = new Cadastro();
+            excluir.Remover(id);
+            ShowAll();
+
+            limparInputs();
+            ativarBotoes();
+            ativarInputs();
+            inptConfirmarRemover.Visible = false;
+            inptCancelar.Visible = false;
         }
     }
 }

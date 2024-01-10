@@ -84,7 +84,7 @@
             this.inptConfirmarPesquisa.Name = "inptConfirmarPesquisa";
             this.inptConfirmarPesquisa.Size = new System.Drawing.Size(75, 23);
             this.inptConfirmarPesquisa.TabIndex = 4;
-            this.inptConfirmarPesquisa.Text = "Confirmar";
+            this.inptConfirmarPesquisa.Text = "Pesqusiar";
             this.inptConfirmarPesquisa.UseVisualStyleBackColor = true;
             this.inptConfirmarPesquisa.Click += new System.EventHandler(this.inptConfirmarPesquisa_Click);
             // 
@@ -136,6 +136,7 @@
             this.inptConfirmarRemover.TabIndex = 9;
             this.inptConfirmarRemover.Text = "Excluir";
             this.inptConfirmarRemover.UseVisualStyleBackColor = true;
+            this.inptConfirmarRemover.Click += new System.EventHandler(this.inptConfirmarRemover_Click);
             // 
             // Form1
             // 
