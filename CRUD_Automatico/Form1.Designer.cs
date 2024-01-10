@@ -33,6 +33,8 @@
             this.inptAdicionar = new System.Windows.Forms.Button();
             this.inptPesquisar = new System.Windows.Forms.Button();
             this.inptConfirmarPesquisa = new System.Windows.Forms.Button();
+            this.btnEditar = new System.Windows.Forms.Button();
+            this.btnRemover = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).BeginInit();
             this.SuspendLayout();
             // 
@@ -43,6 +45,7 @@
             this.dataGD.Name = "dataGD";
             this.dataGD.Size = new System.Drawing.Size(700, 169);
             this.dataGD.TabIndex = 0;
+            this.dataGD.SelectionChanged += new System.EventHandler(this.dataGD_SelectionChanged);
             // 
             // inptPainel
             // 
@@ -64,7 +67,7 @@
             // 
             // inptPesquisar
             // 
-            this.inptPesquisar.Location = new System.Drawing.Point(263, 223);
+            this.inptPesquisar.Location = new System.Drawing.Point(255, 223);
             this.inptPesquisar.Name = "inptPesquisar";
             this.inptPesquisar.Size = new System.Drawing.Size(75, 23);
             this.inptPesquisar.TabIndex = 3;
@@ -82,11 +85,31 @@
             this.inptConfirmarPesquisa.UseVisualStyleBackColor = true;
             this.inptConfirmarPesquisa.Click += new System.EventHandler(this.inptConfirmarPesquisa_Click);
             // 
+            // btnEditar
+            // 
+            this.btnEditar.Location = new System.Drawing.Point(93, 223);
+            this.btnEditar.Name = "btnEditar";
+            this.btnEditar.Size = new System.Drawing.Size(75, 23);
+            this.btnEditar.TabIndex = 5;
+            this.btnEditar.Text = "Editar";
+            this.btnEditar.UseVisualStyleBackColor = true;
+            // 
+            // btnRemover
+            // 
+            this.btnRemover.Location = new System.Drawing.Point(174, 223);
+            this.btnRemover.Name = "btnRemover";
+            this.btnRemover.Size = new System.Drawing.Size(75, 23);
+            this.btnRemover.TabIndex = 6;
+            this.btnRemover.Text = "Remover";
+            this.btnRemover.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(724, 450);
+            this.Controls.Add(this.btnRemover);
+            this.Controls.Add(this.btnEditar);
             this.Controls.Add(this.inptConfirmarPesquisa);
             this.Controls.Add(this.inptPesquisar);
             this.Controls.Add(this.inptAdicionar);
@@ -107,6 +130,8 @@
         private System.Windows.Forms.Button inptAdicionar;
         private System.Windows.Forms.Button inptPesquisar;
         private System.Windows.Forms.Button inptConfirmarPesquisa;
+        private System.Windows.Forms.Button btnEditar;
+        private System.Windows.Forms.Button btnRemover;
     }
 }
 

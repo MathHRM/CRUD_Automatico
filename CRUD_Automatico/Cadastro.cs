@@ -11,9 +11,9 @@ namespace CRUD_Automatico
     {
         private MySqlConnection _conxSql = new MySqlConnection(BDInfo.Server);
 
-        private Dictionary<string, string> _colunas = new Dictionary<string, string>();
+        private Dictionary<string, string> _colunasAtrr = new Dictionary<string, string>();
 
-        public Dictionary<string, string> Colunas { get { return _colunas; } }
+        public Dictionary<string, string> ColunasAtributos { get { return _colunasAtrr; } }
 
         private List<string> _nomeColunas;
         public List<string> NomeColunas { get { return _nomeColunas; } }
@@ -23,7 +23,7 @@ namespace CRUD_Automatico
         public Cadastro()
         {
             GetColumn();
-            _nomeColunas = new List<string>(_colunas.Keys);
+            _nomeColunas = new List<string>(_colunasAtrr.Keys);
         }
 
         public bool Adicionar(Dictionary<string, string> values)
@@ -108,7 +108,7 @@ namespace CRUD_Automatico
 
         private void SetParametros(MySqlCommand comando, Dictionary<string, string> values)
         {
-            for (int i = 0; i < Colunas.Count; i++)
+            for (int i = 0; i < ColunasAtributos.Count; i++)
             {
                 if (_nomeColunas[i].Equals(_id)) continue;
 
@@ -209,7 +209,7 @@ namespace CRUD_Automatico
                         constraint = "PRIMARY KEY";
                     }
 
-                    _colunas.Add(col.Field<String>("ColumnName"), constraint);
+                    _colunasAtrr.Add(col.Field<String>("ColumnName"), constraint);
                 }
             }
             catch (Exception ex)

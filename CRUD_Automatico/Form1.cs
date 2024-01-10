@@ -31,7 +31,7 @@ namespace CRUD_Automatico
         private void setAllInputs()
         {
             Cadastro c = new Cadastro();
-            var colunas = c.Colunas;
+            var colunas = c.ColunasAtributos;
             var nomeColunas = c.NomeColunas;
 
             foreach (var nCol in nomeColunas)
@@ -117,6 +117,11 @@ namespace CRUD_Automatico
 
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
+            pesquisar();
+        }
+
+        private void pesquisar()
+        {
             Cadastro p = new Cadastro();
             string stringId = "";
             foreach (InputControl input in inptPainel.Controls)
@@ -169,6 +174,32 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.setReadOnly(false);
+            }
+        }
+
+        private void desativarBotoes()
+        {
+
+        }
+
+        private void dataGD_SelectionChanged(object sender, EventArgs e)
+        {
+            DataGridView dgv = (DataGridView)sender;
+            int contLinhas = dgv.Rows.Count;
+            string idSelecionado;
+
+            if (contLinhas > 0)
+            {
+                bool rowSelecionado = dataGD.SelectedRows.Count > 0;
+                if (rowSelecionado)
+                {
+                    idSelecionado = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value.ToString();
+                    foreach (InputControl i in inptPainel.Controls)
+                    {
+                        if (i.isId) i.Input.Text = idSelecionado;
+                    }
+                    pesquisar();
+                }
             }
         }
     }
