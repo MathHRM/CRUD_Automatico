@@ -47,6 +47,9 @@ namespace CRUD_Automatico
             if (properties.Contains("NULLABLE"))
                 _nullable = true;
 
+            if (properties.Contains("READ ONLY"))
+                setReadOnly(true);
+
             if (col.ToLower().Contains("cpf"))
                 inpt.Mask = "000.000.000-00";
 
