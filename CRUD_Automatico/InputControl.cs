@@ -16,7 +16,6 @@ namespace CRUD_Automatico
         public string Value { get { return inpt.Text; } }
         public string Column { get { return _colRef; } }
         public TextBox Input { get { return inpt; } } 
-
         public bool isId { get; }
 
 
@@ -27,6 +26,7 @@ namespace CRUD_Automatico
             lbl.Text = col;
             _colRef = col;
         }
+
         public InputControl(string col, bool isId)
         {
             InitializeComponent();
