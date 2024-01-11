@@ -147,12 +147,11 @@ namespace CRUD_Automatico
         private void setAllInputs()
         {
             Cadastro c = new Cadastro();
-            var colunas = c.ColunasAtributos;
-            var nomeColunas = c.NomeColunas;
+            var colunas = c.Colunas;
 
-            foreach (var nCol in nomeColunas)
+            foreach (var nomeCol in colunas.Keys)
             {
-                InputControl input = new InputControl(nCol, colunas[nCol]);
+                InputControl input = new InputControl(colunas[nomeCol]);
 
                 inptPainel.Controls.Add(input);
             }

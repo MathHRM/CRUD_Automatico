@@ -39,29 +39,26 @@ namespace CRUD_Automatico
             _colRef = col;
         }
 
-        public InputControl(string col, string properties)
+        public InputControl(MySqlColumn col)
         {
             InitializeComponent();
 
-            if (properties.Contains("PRIMARY KEY")) { 
+            if (col.IsKey) { 
                 this.isId = true; 
                 setReadOnly(true);
             }
 
-            if (properties.Contains("NULLABLE"))
+            if (col.IsNullable)
                 _nullable = true;
 
-            if (properties.Contains("READ ONLY"))
-                setReadOnly(true);
-
-            if (col.ToLower().Contains("cpf"))
+            if (col.Nome.ToLower().Contains("cpf"))
                 inpt.Mask = "000.000.000-00";
 
-            if (col.ToLower().Contains("telefone"))
+            if (col.Nome.ToLower().Contains("telefone"))
                 inpt.Mask = "(00) 0 0000-0000";
 
-            lbl.Text = col;
-            _colRef = col;
+            lbl.Text = col.Nome;
+            _colRef = col.Nome;
         }
 
         public void setReadOnly(bool enabled)
