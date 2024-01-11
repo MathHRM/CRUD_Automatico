@@ -17,31 +17,24 @@ namespace CRUD_Automatico
         private bool _nullable;
         private string _strDataType;
         private MySqlDbType _dataType;
-        private int _maxLength;
-        private int _precision;
         private bool _key;
         private string _extra;
 
         public string Nome { get { return _nome; } }
         public bool IsNullable { get { return _nullable; } }
-
         public string StrDataType { get { return _strDataType; } }
         public MySqlDbType DataType { get { return _dataType; } }
-        public int MaxLength { get { return _maxLength; } }
-        public int Precision { get { return _precision; } }
         public bool IsKey { get { return _key; } }
         public string Extra { get { return _extra; } }
 
         public List<string> Constraints { get; set; }
 
-        public MySqlColumn(string nome, bool nullable, string dataType, int maxLength, int precision, bool key, string extra)
+        public MySqlColumn(string nome, bool nullable, string dataType, bool key, string extra)
         {
             _nome = nome;
             _nullable = nullable;
             _strDataType = dataType;
             _dataType = setDataType(dataType);
-            _maxLength = maxLength;
-            _precision = precision;
             _key = key;
             _extra = extra;
         }

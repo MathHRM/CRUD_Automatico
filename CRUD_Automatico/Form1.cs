@@ -33,7 +33,7 @@ namespace CRUD_Automatico
 
             if (!inputsPreenchidos())
             {
-                MessageBox.Show("Preencha todos os inputs");
+                MessageBox.Show("Preencha todos os campos");
                 return;
             }
 
@@ -171,17 +171,22 @@ namespace CRUD_Automatico
 
         private bool inputsPreenchidos()
         {
+            bool preenchidos = true;
+
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
                 {
-                    if (i.Value == string.Empty && i.IsNullable)
-                        return false;
-                    if (!i.MascaraCompleta)
-                        return false;
+                    if (i.Value.Equals(string.Empty))
+                    {
+                        if (!i.IsNullable)
+                            preenchidos = false;
+                        else if (!i.MascaraCompleta)
+                            preenchidos = false;
+                    }
                 }
             }
-            return true;
+            return preenchidos;
         }
 
         private void limparInputs()

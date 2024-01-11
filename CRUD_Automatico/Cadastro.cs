@@ -112,11 +112,7 @@ namespace CRUD_Automatico
 
                 var colunaParam = $"@{_nomeColunas[i]}";
 
-                if (colunaAtual.StrDataType.Equals("varchar"))
-                {
-                    comando.Parameters.Add(colunaParam, colunaAtual.DataType, colunaAtual.MaxLength);
-                }
-                
+                comando.Parameters.Add(colunaParam, colunaAtual.DataType);
                 comando.Parameters[colunaParam].Value = values[coluna];
             }
         }
@@ -186,56 +182,25 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
 
-                /*DataTable schema = null;
-                
+                DataTable schema = null;
+
                 var schemaCommand = new MySqlCommand(
-                    $"SELECT * FROM {BDInfo.Table}", _conxSql);
-
-                var reader = schemaCommand.ExecuteReader(CommandBehavior.SchemaOnly);
-                schema = reader.GetSchemaTable();
-
-                foreach (DataRow column in schema.Rows)
-                {
-                    var col = new MySqlColumn(column);
-                    _colunas.Add(col.Nome, col);
-                }*/
-
-
-
-
-
-
-                DataTable schema2 = null;
-
-                var schemaCommand2 = new MySqlCommand(
                     $"select COLUMN_NAME, IS_NULLABLE, DATA_TYPE, COLUMN_KEY, EXTRA, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
 
-                var reader2 = schemaCommand2.ExecuteReader();
+                var reader = schemaCommand.ExecuteReader();
 
-                while (reader2.Read())
+                while (reader.Read())
                 {
-                    string nome = reader2["COLUMN_NAME"].ToString();
-                    bool nullable = reader2["COLUMN_NAME"].ToString().Equals("YES");
-                    string dataType = reader2["DATA_TYPE"].ToString();
-
-                    int maxLength = 0;
-                    int precision = 0;
-                    try
-                    {
-                        maxLength = reader2.GetInt32(5);
-                    }
-                    catch (Exception ex)
-                    {
-                        precision = reader2.GetInt32(6);
-                    }
-
-                    bool key = reader2["COLUMN_KEY"].ToString().Equals("PRI");
-                    string extra = reader2["EXTRA"].ToString();
+                    string nome = reader["COLUMN_NAME"].ToString();
+                    bool nullable = reader["IS_NULLABLE"].ToString().Equals("YES");
+                    string dataType = reader["DATA_TYPE"].ToString();
+                    bool key = reader["COLUMN_KEY"].ToString().Equals("PRI");
+                    string extra = reader["EXTRA"].ToString();
 
                     if (key)
                         _id = nome;
 
-                    _colunas.Add(nome, new MySqlColumn(nome, nullable, dataType, maxLength, precision, key, extra));
+                    _colunas.Add(nome, new MySqlColumn(nome, nullable, dataType, key, extra));
                 }
             }
             catch (Exception ex)
