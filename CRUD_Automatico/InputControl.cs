@@ -42,6 +42,9 @@ namespace CRUD_Automatico
         public InputControl(MySqlColumn col)
         {
             InitializeComponent();
+            
+            lbl.Text = col.Nome;
+            _colRef = col.Nome;
 
             if (col.IsKey) { 
                 this.isId = true; 
@@ -49,16 +52,27 @@ namespace CRUD_Automatico
             }
 
             if (col.IsNullable)
+            {
                 _nullable = true;
+            }
 
             if (col.Nome.ToLower().Contains("cpf"))
+            {
                 inpt.Mask = "000.000.000-00";
+                return;
+            }
 
             if (col.Nome.ToLower().Contains("telefone"))
+            {
                 inpt.Mask = "(00) 0 0000-0000";
+                return;
+            }
 
-            lbl.Text = col.Nome;
-            _colRef = col.Nome;
+            if (col.StrDataType.Equals("date"))
+            {
+                inpt.Mask = "0000/00/00";
+                return;
+            }
         }
 
         public void setReadOnly(bool enabled)

@@ -12,7 +12,7 @@ namespace CRUD_Automatico
         private static string _uid = "root";
         private static string _pwd = "senhasql";
         private static string _database = "mydb";
-        public static string Table { get { return "mytable"; } }
+        public static string Table { get { return "pessoa"; } }
         public static string DataBase { get { return _database; } }
 
         public static string Server

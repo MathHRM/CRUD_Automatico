@@ -112,8 +112,10 @@ namespace CRUD_Automatico
 
                 var colunaParam = $"@{_nomeColunas[i]}";
 
-                comando.Parameters.Add(colunaParam, colunaAtual.DataType);
-                comando.Parameters[colunaParam].Value = values[coluna];
+                /*comando.Parameters.Add(colunaParam, colunaAtual.DataType);
+                comando.Parameters[colunaParam].Value = values[coluna];*/
+
+                comando.Parameters.AddWithValue(colunaParam, values[coluna]);
             }
         }
 
@@ -182,20 +184,20 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
 
-                DataTable schema = null;
+                DataTable schema2 = null;
 
-                var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME, IS_NULLABLE, DATA_TYPE, COLUMN_KEY, EXTRA, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
+                var schemaCommand2 = new MySqlCommand(
+                    $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
 
-                var reader = schemaCommand.ExecuteReader();
+                var reader2 = schemaCommand2.ExecuteReader();
 
-                while (reader.Read())
+                while (reader2.Read())
                 {
-                    string nome = reader["COLUMN_NAME"].ToString();
-                    bool nullable = reader["IS_NULLABLE"].ToString().Equals("YES");
-                    string dataType = reader["DATA_TYPE"].ToString();
-                    bool key = reader["COLUMN_KEY"].ToString().Equals("PRI");
-                    string extra = reader["EXTRA"].ToString();
+                    string nome = reader2["COLUMN_NAME"].ToString();
+                    bool nullable = reader2["IS_NULLABLE"].ToString().Equals("YES");
+                    string dataType = reader2["DATA_TYPE"].ToString();
+                    bool key = reader2["COLUMN_KEY"].ToString().Equals("PRI");
+                    string extra = reader2["EXTRA"].ToString();
 
                     if (key)
                         _id = nome;
