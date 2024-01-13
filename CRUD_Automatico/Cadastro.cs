@@ -12,18 +12,30 @@ namespace CRUD_Automatico
         private MySqlConnection _conxSql = new MySqlConnection(BDInfo.Server);
 
         private Dictionary<string, MySqlColumn> _colunas = new Dictionary<string, MySqlColumn>();
-        public Dictionary<string, MySqlColumn> Colunas { get { return _colunas; } }
+
+        public Dictionary<string, MySqlColumn> Colunas 
+        { 
+            get 
+            {
+                if( _colunas.Count < 1 )
+                {
+                    SetColumns();
+                }
+                return _colunas; 
+            } 
+        }
 
         private List<string> _nomeColunas;
         public List<string> NomeColunas { get { return _nomeColunas; } }
 
         private string _id;
+
         public string ID { get { return _id; } }
 
         public Cadastro()
         {
-            GetColumn();
-            _nomeColunas = new List<string>(_colunas.Keys);
+            _nomeColunas = getColumnsName();
+            _id = getIdColumn();
         }
 
         public bool Adicionar(Dictionary<string, string> values)
@@ -36,7 +48,7 @@ namespace CRUD_Automatico
                 string valoresColunas = "";
                 for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (_nomeColunas[i].Equals(_id)) continue;
+                    if (_nomeColunas[i].Equals( _id )) continue;
 
                     nomeColunas += _nomeColunas[i];
                     valoresColunas += "@" + _nomeColunas[i];
@@ -74,15 +86,20 @@ namespace CRUD_Automatico
                 _conxSql.Open();
 
                 string set = "";
-                for (int i = 0; i < NomeColunas.Count; i++)
+                for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (_nomeColunas[i].Equals(_id)) continue;
-                    set += $"{NomeColunas[i]} = @{NomeColunas[i]}";
-                    if (i < NomeColunas.Count - 1) set += ", ";
+                    if (_nomeColunas[i].Equals(_id))
+                        continue;
+                    
+                    set += $"{_nomeColunas[i]} = @{_nomeColunas[i]}";
+
+                    if (i < _nomeColunas.Count - 1) set += ", ";
                 }
 
+                Console.WriteLine("set: " + set);
+
                 var comando = new MySqlCommand(
-                    $"UPDATE {BDInfo.Table} SET {set} WHERE {_id} = {id};", _conxSql);
+                    $"UPDATE {BDInfo.Table} SET {set} WHERE { _id } = {id};", _conxSql);
 
                 definirParametros(comando, values);
 
@@ -92,7 +109,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao adicionar ao BD\n\n" + ex.Message);
+                Console.WriteLine("Erro ao editar no BD\n\n" + ex.Message);
                 return false;
             }
             finally
@@ -103,14 +120,13 @@ namespace CRUD_Automatico
 
         private void definirParametros(MySqlCommand comando, Dictionary<string, string> values)
         {
-            for (int i = 0; i < Colunas.Count; i++)
+            for (int i = 0; i < _nomeColunas.Count; i++)
             {
                 string coluna = _nomeColunas[i];
-                MySqlColumn colunaAtual = _colunas[coluna];
 
-                if (colunaAtual.IsKey) continue;
+                if (coluna.Equals( _id )) continue;
 
-                var colunaParam = $"@{_nomeColunas[i]}";
+                var colunaParam = $"@{coluna}";
 
                 /*comando.Parameters.Add(colunaParam, colunaAtual.DataType);
                 comando.Parameters[colunaParam].Value = values[coluna];*/
@@ -125,7 +141,7 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"DELETE FROM {BDInfo.Table} WHERE {_id} = {ID}", _conxSql);
+                    $"DELETE FROM {BDInfo.Table} WHERE { _id } = {ID}", _conxSql);
                 comando.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -144,7 +160,9 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"SELECT * FROM {BDInfo.Table} WHERE {_id} = {ID};", _conxSql);
+                    $"SELECT * FROM {BDInfo.Table} WHERE { _id } = {ID};", _conxSql);
+
+                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE { _id } = {ID};");
 
                 var reader = comando.ExecuteReader();
 
@@ -152,7 +170,7 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao remover do BD\n" + ex.Message);
+                Console.WriteLine("Erro ao pesquisar no BD\n" + ex.Message);
                 _conxSql.Close();
                 return null;
             }
@@ -163,6 +181,7 @@ namespace CRUD_Automatico
             try
             {
                 _conxSql.Open();
+
                 var comando = new MySqlCommand(
                     $"SELECT * FROM {BDInfo.Table};", _conxSql);
 
@@ -172,35 +191,31 @@ namespace CRUD_Automatico
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao pesquisar do BD\n" + ex.Message);
+                Console.WriteLine("Erro ao pesquisar todos no BD\n" + ex.Message);
                 _conxSql.Close();
                 return null;
             }
         }
 
-        private void GetColumn()
+        private void SetColumns()
         {
             try
             {
-                _conxSql.Open();
+                if(_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
 
-                DataTable schema2 = null;
+                var schemaCommand = new MySqlCommand(
+                    $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
 
-                var schemaCommand2 = new MySqlCommand(
-                    $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
+                var reader = schemaCommand.ExecuteReader();
 
-                var reader2 = schemaCommand2.ExecuteReader();
-
-                while (reader2.Read())
+                while (reader.Read())
                 {
-                    string nome = reader2["COLUMN_NAME"].ToString();
-                    bool nullable = reader2["IS_NULLABLE"].ToString().Equals("YES");
-                    string dataType = reader2["DATA_TYPE"].ToString();
-                    bool key = reader2["COLUMN_KEY"].ToString().Equals("PRI");
-                    string extra = reader2["EXTRA"].ToString();
-
-                    if (key)
-                        _id = nome;
+                    string nome = reader["COLUMN_NAME"].ToString();
+                    bool nullable = reader["IS_NULLABLE"].ToString().Equals("YES");
+                    string dataType = reader["DATA_TYPE"].ToString();
+                    bool key = reader["COLUMN_KEY"].ToString().Equals("PRI");
+                    string extra = reader["EXTRA"].ToString();
 
                     _colunas.Add(nome, new MySqlColumn(nome, nullable, dataType, key, extra));
                 }
@@ -208,6 +223,34 @@ namespace CRUD_Automatico
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pegar colunas do BD\n" + ex.Message);
+            }
+            finally
+            {
+                _conxSql.Close();
+            }
+        }
+
+        private string getIdColumn()
+        {
+            try
+            {
+                if (_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
+
+                var schemaCommand = new MySqlCommand(
+                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_KEY = 'PRI';", _conxSql);
+
+                var reader = schemaCommand.ExecuteReader();
+
+                reader.Read();
+                string nome = reader["COLUMN_NAME"].ToString();
+
+                return nome;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao pegar ID do BD\n" + ex.Message);
+                return null;
             }
             finally
             {
@@ -233,5 +276,39 @@ namespace CRUD_Automatico
                 _conxSql.Close();
             }
         }
+
+        public List<string> getColumnsName()
+        {
+            try
+            {
+                if (_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
+
+                List<string> list = new List<string>();
+
+                var schemaCommand = new MySqlCommand(
+                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
+
+                var reader = schemaCommand.ExecuteReader();
+
+                while(reader.Read())
+                {
+                    string nome = reader["COLUMN_NAME"].ToString();
+                    list.Add(nome);
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao pegar ID do BD\n" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                _conxSql.Close();
+            }
+        }
+
     }
 }

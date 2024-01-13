@@ -17,14 +17,14 @@ namespace CRUD_Automatico
         private string _nome;
         private bool _nullable;
         private string _strDataType;
-        private int _dataType;
+        private MySqlDbType _dataType;
         private bool _key;
         private string _extra;
 
         public string Nome { get { return _nome; } }
         public bool IsNullable { get { return _nullable; } }
         public string StrDataType { get { return _strDataType; } }
-        public int DataType { get { return _dataType; } }
+        public MySqlDbType DataType { get { return _dataType; } }
         public bool IsKey { get { return _key; } }
         public string Extra { get { return _extra; } }
 
@@ -35,9 +35,42 @@ namespace CRUD_Automatico
             _nome = nome;
             _nullable = nullable;
             _strDataType = dataType;
-            Console.WriteLine("Tipo de data: " + dataType);
+            _dataType = getSqlType(_strDataType);
             _key = key;
             _extra = extra;
+        }
+
+        public MySqlDbType getSqlType(string type)
+        {
+            // Um loop pelo enum mysqlType
+            // se a representacao em string do enum for igual o tipo
+            // fornecido, retorna o enum
+            // se nao for encontrado uma representação, retorna varchar
+
+            MySqlDbType value = MySqlDbType.VarChar;
+            bool encontrado = false;
+
+            // string passa a representação exatamente igual do enum
+            foreach (MySqlDbType dbtype in Enum.GetValues(typeof(MySqlDbType)))
+            {
+                if (dbtype.ToString().ToLower().Equals(type))
+                {
+                    encontrado = true;
+                    value = dbtype;
+                }
+            }
+
+            // valor mais aproximado se não encontrado a representação correta
+            if(!encontrado)
+            foreach (MySqlDbType dbtype in Enum.GetValues(typeof(MySqlDbType)))
+            {
+                if (dbtype.ToString().ToLower().Contains(type))
+                {
+                    value = dbtype;
+                }
+            }
+
+            return value;
         }
     }
 }
