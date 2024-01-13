@@ -70,7 +70,7 @@ namespace CRUD_Automatico
 
             if (col.StrDataType.Equals("date"))
             {
-                inpt.Mask = "0000/00/00";
+                inpt.Mask = "00/00/0000";
                 return;
             }
         }

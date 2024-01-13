@@ -148,7 +148,7 @@ namespace CRUD_Automatico
         private void setAllInputs()
         {
             Cadastro c = new Cadastro();
-            var colunas = c.Colunas;
+            var colunas = c.GetColumns();
 
             foreach (var nomeCol in colunas.Keys)
             {
@@ -253,19 +253,23 @@ namespace CRUD_Automatico
         {
             DataGridView dgv = (DataGridView)sender;
             int contLinhas = dgv.Rows.Count;
-            string idSelecionado;
+            object idSelecionado;
 
             if (contLinhas > 0)
             {
                 bool rowSelecionado = dataGD.SelectedRows.Count > 0;
                 if (rowSelecionado)
                 {
-                    idSelecionado = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value.ToString();
-                    foreach (InputControl i in inptPainel.Controls)
+                    idSelecionado = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value;
+
+                    if(idSelecionado != null)
                     {
-                        if (i.isId) i.Value = idSelecionado;
+                        foreach (InputControl i in inptPainel.Controls)
+                        {
+                            if (i.isId) i.Value = idSelecionado.ToString();
+                        }
+                        pesquisar();
                     }
-                    pesquisar();
                 }
             }
         }
