@@ -183,9 +183,6 @@ namespace CRUD_Automatico
         {
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
                 Dictionary<string, MySqlColumn> colunas = new Dictionary<string, MySqlColumn>();
 
                 var schemaCommand = new MySqlCommand(
