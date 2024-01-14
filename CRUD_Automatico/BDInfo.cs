@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CRUD_Automatico
+﻿namespace CRUD_Automatico
 {
     internal static class BDInfo
     {
@@ -12,7 +6,7 @@ namespace CRUD_Automatico
         private static string _uid = "root";
         private static string _pwd = "senhasql";
         private static string _database = "mydb";
-        public static string Table { get { return "pessoa"; } }
+        public static string Table { get { return "mytable"; } }
         public static string DataBase { get { return _database; } }
 
         public static string Server

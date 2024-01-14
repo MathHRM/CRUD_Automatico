@@ -44,9 +44,9 @@
             // 
             // inpt
             // 
-            this.inpt.Location = new System.Drawing.Point(59, 0);
+            this.inpt.Location = new System.Drawing.Point(86, 0);
             this.inpt.Name = "inpt";
-            this.inpt.Size = new System.Drawing.Size(215, 20);
+            this.inpt.Size = new System.Drawing.Size(188, 20);
             this.inpt.TabIndex = 2;
             // 
             // InputControl
