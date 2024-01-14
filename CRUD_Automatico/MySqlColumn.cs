@@ -1,14 +1,6 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlTypes;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using MySql.Data.MySqlClient;
-using System.Reflection;
 
 namespace CRUD_Automatico
 {
@@ -61,14 +53,14 @@ namespace CRUD_Automatico
             }
 
             // valor mais aproximado se não encontrado a representação correta
-            if(!encontrado)
-            foreach (MySqlDbType dbtype in Enum.GetValues(typeof(MySqlDbType)))
-            {
-                if (dbtype.ToString().ToLower().Contains(type))
+            if (!encontrado)
+                foreach (MySqlDbType dbtype in Enum.GetValues(typeof(MySqlDbType)))
                 {
-                    value = dbtype;
+                    if (dbtype.ToString().ToLower().Contains(type))
+                    {
+                        value = dbtype;
+                    }
                 }
-            }
 
             return value;
         }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace CRUD_Automatico
 {
@@ -21,7 +13,7 @@ namespace CRUD_Automatico
             set { inpt.Text = value; }
         }
 
-        public MaskedTextBox Input { get { return inpt; } } 
+        public MaskedTextBox Input { get { return inpt; } }
 
         public bool isId { get; }
 
@@ -42,12 +34,13 @@ namespace CRUD_Automatico
         public InputControl(MySqlColumn col)
         {
             InitializeComponent();
-            
+
             lbl.Text = col.Nome;
             _colRef = col.Nome;
 
-            if (col.IsKey) { 
-                this.isId = true; 
+            if (col.IsKey)
+            {
+                this.isId = true;
                 setReadOnly(true);
             }
 

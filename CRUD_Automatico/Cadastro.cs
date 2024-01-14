@@ -14,12 +14,11 @@ namespace CRUD_Automatico
         public List<string> NomeColunas { get { return _nomeColunas; } }
 
         private string _id;
-
         public string ID { get { return _id; } }
 
         public Cadastro()
         {
-            _nomeColunas = getColumnsName();
+            _nomeColunas = getColumnNames();
             _id = getIdColumn();
         }
 
@@ -103,21 +102,16 @@ namespace CRUD_Automatico
 
         private void definirParametros(MySqlCommand comando, Dictionary<string, string> values)
         {
-            var colunas = GetColumns();
-
             for (int i = 0; i < _nomeColunas.Count; i++)
             {
                 string coluna = _nomeColunas[i];
 
                 if (coluna.Equals(_id)) continue;
 
-                if (colunas[coluna].StrDataType.Contains("date"))
+                if ( getColumnType(coluna).Contains("date") )
                     values[coluna] = changeDateFormat(values[coluna]);
 
                 var colunaParam = $"@{coluna}";
-
-                /*comando.Parameters.Add(colunaParam, colunaAtual.DataType);
-                comando.Parameters[colunaParam].Value = values[coluna];*/
 
                 comando.Parameters.AddWithValue(colunaParam, values[coluna]);
             }
@@ -268,7 +262,7 @@ namespace CRUD_Automatico
             }
         }
 
-        public List<string> getColumnsName()
+        public List<string> getColumnNames()
         {
             try
             {
@@ -335,7 +329,35 @@ namespace CRUD_Automatico
 
         public string changeDateFormat(string date)
         {
-            return DateTime.Parse(date).ToString("yyyy/MM/dd");
+            if (date.Length < 11)
+                return DateTime.Parse(date).ToString("yyyy/MM/dd");
+            else
+                return DateTime.Parse(date).ToString("yyyy/MM/dd HH:mm:ss");
+        }
+
+        private string getColumnType(string col)
+        {
+            try
+            {
+                if (_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
+
+                var schemaCommand = new MySqlCommand(
+                    $"select DATA_TYPE from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_NAME = '{col}';", _conxSql);
+
+                var reader = schemaCommand.ExecuteReader();
+
+                reader.Read();
+                string dt = reader["DATA_TYPE"].ToString();
+                reader.Close();
+
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao pegar data type do BD\n" + ex.Message);
+                return null;
+            }
         }
     }
 }

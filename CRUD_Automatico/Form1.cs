@@ -1,12 +1,6 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CRUD_Automatico
@@ -174,19 +168,23 @@ namespace CRUD_Automatico
         {
             bool preenchidos = true;
 
-            foreach (InputControl i in inptPainel.Controls)
+            for (int i = 0; i < inptPainel.Controls.Count; i++)
             {
-                if (!i.isId)
+                InputControl inpt = (InputControl)inptPainel.Controls[i];
+
+                if (!inpt.isId)
+                    continue;
+
+                if (!inpt.IsNullable && inpt.Value.Equals(string.Empty))
                 {
-                    if (i.Value.Equals(string.Empty))
-                    {
-                        if (!i.IsNullable)
-                            preenchidos = false;
-                        else if (!i.MascaraCompleta)
-                            preenchidos = false;
-                    }
+                    preenchidos = false;
+                    continue;
                 }
+
+                if (!inpt.MascaraCompleta)
+                    preenchidos = false;
             }
+
             return preenchidos;
         }
 
@@ -253,25 +251,24 @@ namespace CRUD_Automatico
         {
             DataGridView dgv = (DataGridView)sender;
             int contLinhas = dgv.Rows.Count;
-            object idSelecionado;
+            object idRowSelecionada;
 
-            if (contLinhas > 0)
+            if (contLinhas < 1)
+                return;
+
+            if (dataGD.SelectedRows.Count < 1)
+                return;
+
+            idRowSelecionada = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value;
+
+            if (idRowSelecionada == null)
+                return;
+
+            foreach (InputControl i in inptPainel.Controls)
             {
-                bool rowSelecionado = dataGD.SelectedRows.Count > 0;
-                if (rowSelecionado)
-                {
-                    idSelecionado = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[0].Value;
-
-                    if(idSelecionado != null)
-                    {
-                        foreach (InputControl i in inptPainel.Controls)
-                        {
-                            if (i.isId) i.Value = idSelecionado.ToString();
-                        }
-                        pesquisar();
-                    }
-                }
+                if (i.isId) i.Value = idRowSelecionada.ToString();
             }
+            pesquisar();
         }
 
         private void inptCancelar_Click(object sender, EventArgs e)
