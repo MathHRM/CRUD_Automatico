@@ -43,10 +43,12 @@
             // 
             // dataGD
             // 
+            this.dataGD.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGD.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGD.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGD.Location = new System.Drawing.Point(12, 298);
+            this.dataGD.Location = new System.Drawing.Point(12, 281);
             this.dataGD.Name = "dataGD";
-            this.dataGD.Size = new System.Drawing.Size(700, 169);
+            this.dataGD.Size = new System.Drawing.Size(700, 186);
             this.dataGD.TabIndex = 0;
             this.dataGD.SelectionChanged += new System.EventHandler(this.dataGD_SelectionChanged);
             // 
@@ -60,7 +62,7 @@
             // 
             // inptAdicionar
             // 
-            this.inptAdicionar.Location = new System.Drawing.Point(12, 269);
+            this.inptAdicionar.Location = new System.Drawing.Point(12, 223);
             this.inptAdicionar.Name = "inptAdicionar";
             this.inptAdicionar.Size = new System.Drawing.Size(75, 23);
             this.inptAdicionar.TabIndex = 2;
@@ -70,7 +72,7 @@
             // 
             // inptPesquisar
             // 
-            this.inptPesquisar.Location = new System.Drawing.Point(255, 269);
+            this.inptPesquisar.Location = new System.Drawing.Point(255, 223);
             this.inptPesquisar.Name = "inptPesquisar";
             this.inptPesquisar.Size = new System.Drawing.Size(75, 23);
             this.inptPesquisar.TabIndex = 3;
@@ -80,7 +82,7 @@
             // 
             // inptConfirmarPesquisa
             // 
-            this.inptConfirmarPesquisa.Location = new System.Drawing.Point(637, 269);
+            this.inptConfirmarPesquisa.Location = new System.Drawing.Point(637, 223);
             this.inptConfirmarPesquisa.Name = "inptConfirmarPesquisa";
             this.inptConfirmarPesquisa.Size = new System.Drawing.Size(75, 23);
             this.inptConfirmarPesquisa.TabIndex = 4;
@@ -90,7 +92,7 @@
             // 
             // inptEditar
             // 
-            this.inptEditar.Location = new System.Drawing.Point(93, 269);
+            this.inptEditar.Location = new System.Drawing.Point(93, 223);
             this.inptEditar.Name = "inptEditar";
             this.inptEditar.Size = new System.Drawing.Size(75, 23);
             this.inptEditar.TabIndex = 5;
@@ -100,7 +102,7 @@
             // 
             // inptRemover
             // 
-            this.inptRemover.Location = new System.Drawing.Point(174, 269);
+            this.inptRemover.Location = new System.Drawing.Point(174, 223);
             this.inptRemover.Name = "inptRemover";
             this.inptRemover.Size = new System.Drawing.Size(75, 23);
             this.inptRemover.TabIndex = 6;
@@ -110,7 +112,7 @@
             // 
             // inptConfirmarEdicao
             // 
-            this.inptConfirmarEdicao.Location = new System.Drawing.Point(637, 240);
+            this.inptConfirmarEdicao.Location = new System.Drawing.Point(637, 252);
             this.inptConfirmarEdicao.Name = "inptConfirmarEdicao";
             this.inptConfirmarEdicao.Size = new System.Drawing.Size(75, 23);
             this.inptConfirmarEdicao.TabIndex = 7;
@@ -120,7 +122,7 @@
             // 
             // inptCancelar
             // 
-            this.inptCancelar.Location = new System.Drawing.Point(475, 269);
+            this.inptCancelar.Location = new System.Drawing.Point(475, 223);
             this.inptCancelar.Name = "inptCancelar";
             this.inptCancelar.Size = new System.Drawing.Size(75, 23);
             this.inptCancelar.TabIndex = 8;
@@ -130,7 +132,7 @@
             // 
             // inptConfirmarRemover
             // 
-            this.inptConfirmarRemover.Location = new System.Drawing.Point(556, 269);
+            this.inptConfirmarRemover.Location = new System.Drawing.Point(556, 223);
             this.inptConfirmarRemover.Name = "inptConfirmarRemover";
             this.inptConfirmarRemover.Size = new System.Drawing.Size(75, 23);
             this.inptConfirmarRemover.TabIndex = 9;

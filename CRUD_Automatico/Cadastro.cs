@@ -22,6 +22,13 @@ namespace CRUD_Automatico
             _id = getIdColumn();
         }
 
+       /*
+        * 
+        *  Funcções CRUD
+        *  
+        */
+
+        // Adicionar
         public bool Adicionar(Dictionary<string, string> values)
         {
             try
@@ -29,23 +36,23 @@ namespace CRUD_Automatico
                 _conxSql.Open();
 
                 string nomeColunas = "";
-                string valoresColunas = "";
+                string paramColunas = "";
                 for (int i = 0; i < _nomeColunas.Count; i++)
                 {
                     if (_nomeColunas[i].Equals(_id)) continue;
 
                     nomeColunas += _nomeColunas[i];
-                    valoresColunas += "@" + _nomeColunas[i];
+                    paramColunas += "@" + _nomeColunas[i];
 
                     if (i < _nomeColunas.Count - 1)
                     {
                         nomeColunas += ", ";
-                        valoresColunas += ", ";
+                        paramColunas += ", ";
                     }
                 }
 
                 var comando = new MySqlCommand(
-                    $"INSERT INTO {BDInfo.Table} ({nomeColunas}) values ({valoresColunas});", _conxSql);
+                    $"INSERT INTO {BDInfo.Table} ({nomeColunas}) values ({paramColunas});", _conxSql);
 
                 definirParametros(comando, values);
 
@@ -63,6 +70,7 @@ namespace CRUD_Automatico
             }
         }
 
+        // Editar
         public bool Update(Dictionary<string, string> values, int id)
         {
             try
@@ -100,23 +108,7 @@ namespace CRUD_Automatico
             }
         }
 
-        private void definirParametros(MySqlCommand comando, Dictionary<string, string> values)
-        {
-            for (int i = 0; i < _nomeColunas.Count; i++)
-            {
-                string coluna = _nomeColunas[i];
-
-                if (coluna.Equals(_id)) continue;
-
-                if ( getColumnType(coluna).Contains("date") )
-                    values[coluna] = changeDateFormat(values[coluna]);
-
-                var colunaParam = $"@{coluna}";
-
-                comando.Parameters.AddWithValue(colunaParam, values[coluna]);
-            }
-        }
-
+        // Excluir
         public void Remover(int ID)
         {
             try
@@ -136,6 +128,7 @@ namespace CRUD_Automatico
             }
         }
 
+        // pesquisa um row pelo id
         public MySqlDataReader Pesquisar(int ID)
         {
             try
@@ -158,6 +151,7 @@ namespace CRUD_Automatico
             }
         }
 
+        // pesquisa todos os rows
         public MySqlDataReader PesquisarTodos()
         {
             try
@@ -179,14 +173,55 @@ namespace CRUD_Automatico
             }
         }
 
+        // Define os parametros e valores do comando sql
+        private void definirParametros(MySqlCommand comando, Dictionary<string, string> values)
+        {
+            for (int i = 0; i < _nomeColunas.Count; i++)
+            {
+                string coluna = _nomeColunas[i];
+
+                if (coluna.Equals(_id)) continue;
+
+                if (getColumnType(coluna).Contains("date"))
+                    values[coluna] = mudarFormatoData(values[coluna]);
+
+                var paramColuna = $"@{coluna}";
+
+                comando.Parameters.AddWithValue(paramColuna, values[coluna]);
+            }
+        }
+
+
+
+        /*
+         * 
+         *  Funções para informação sobre colunas
+         *  
+         */
+
+        // retorna um dicionario com o nome e dados de todas as colunas
         public Dictionary<string, MySqlColumn> GetColumns()
         {
             try
             {
+                if (_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
+
                 Dictionary<string, MySqlColumn> colunas = new Dictionary<string, MySqlColumn>();
 
                 var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';", _conxSql);
+                    $"select " +
+                    $"COLUMN_NAME, " +
+                    $"IS_NULLABLE, " +
+                    $"COLUMN_KEY, " +
+                    $"DATA_TYPE, " +
+                    $"EXTRA " +
+                    $"from information_schema.columns " +
+                    $"WHERE TABLE_NAME = @TableName " +
+                    $"AND TABLE_SCHEMA = @TableSchema;", _conxSql);
+
+                schemaCommand.Parameters.AddWithValue("@TableName", BDInfo.Table);
+                schemaCommand.Parameters.AddWithValue("@TableSchema", BDInfo.DataBase);
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -209,56 +244,13 @@ namespace CRUD_Automatico
                 Console.WriteLine("Erro ao pegar colunas do BD\n" + ex.Message);
                 return null;
             }
-        }
-
-        private string getIdColumn()
-        {
-            try
-            {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_KEY = 'PRI';", _conxSql);
-
-                var reader = schemaCommand.ExecuteReader();
-
-                reader.Read();
-                string nome = reader["COLUMN_NAME"].ToString();
-                reader.Close();
-
-                return nome;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao pegar ID do BD\n" + ex.Message);
-                return null;
-            }
             finally
             {
                 _conxSql.Close();
             }
         }
 
-        public bool TestaConexao()
-        {
-            try
-            {
-                _conxSql.Open();
-                Console.WriteLine("Conexão ao DB concluida");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao conectar ao BD\n" + ex.Message);
-                return false;
-            }
-            finally
-            {
-                _conxSql.Close();
-            }
-        }
-
+        // retorna uma lista com o nome de todas as colunas
         public List<string> getColumnNames()
         {
             try
@@ -293,6 +285,7 @@ namespace CRUD_Automatico
             }
         }
 
+        // retorna os dados da coluna pelo nome
         public MySqlColumn getColumn(string col)
         {
             try
@@ -320,18 +313,12 @@ namespace CRUD_Automatico
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pegar colunas do BD\n" + ex.Message);
+                _conxSql.Close();
                 return null;
             }
         }
 
-        public string changeDateFormat(string date)
-        {
-            if (date.Length < 11)
-                return DateTime.Parse(date).ToString("yyyy/MM/dd");
-            else
-                return DateTime.Parse(date).ToString("yyyy/MM/dd HH:mm:ss");
-        }
-
+        // retorna em string o data type da coluna
         private string getColumnType(string col)
         {
             try
@@ -354,6 +341,70 @@ namespace CRUD_Automatico
             {
                 Console.WriteLine("Erro ao pegar data type do BD\n" + ex.Message);
                 return null;
+            }
+        }
+
+        // retorna o nome da coluna id (chave primaria)
+        private string getIdColumn()
+        {
+            try
+            {
+                if (_conxSql.State != ConnectionState.Open)
+                    _conxSql.Open();
+
+                var schemaCommand = new MySqlCommand(
+                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_KEY = 'PRI';", _conxSql);
+
+                var reader = schemaCommand.ExecuteReader();
+
+                reader.Read();
+                string nome = reader["COLUMN_NAME"].ToString();
+                reader.Close();
+
+                return nome;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao pegar ID do BD\n" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                _conxSql.Close();
+            }
+        }
+
+
+
+        //
+        // Outros
+        //
+
+        // muda o formato da data americana (aaaa/MM/dd) para brasileira (dd/MM/aaaa)
+        public string mudarFormatoData(string date)
+        {
+            if (date.Length < 11)
+                return DateTime.Parse(date).ToString("yyyy/MM/dd");
+            else
+                return DateTime.Parse(date).ToString("yyyy/MM/dd HH:mm:ss");
+        }
+
+        public bool TestaConexao()
+        {
+            try
+            {
+                _conxSql.Open();
+                Console.WriteLine("Conexão ao DB concluida");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao conectar ao BD\n" + ex.Message);
+                return false;
+            }
+            finally
+            {
+                _conxSql.Close();
             }
         }
     }
