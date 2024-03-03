@@ -8,18 +8,20 @@ namespace CRUD_Automatico
 {
     internal class Cadastro
     {
-        private MySqlConnection _conxSql = new MySqlConnection(BDInfo.Server);
+        private MySqlConnection _conxSql;
 
         private List<string> _nomeColunas;
         public List<string> NomeColunas { get { return _nomeColunas; } }
 
-        private string _id;
-        public string ID { get { return _id; } }
+        private string _idColumn;
+        public string ID { get { return _idColumn; } }
 
-        public Cadastro()
+        public Cadastro(MySqlConnection conxSql)
         {
+            _conxSql = conxSql;
+
             _nomeColunas = getColumnNames();
-            _id = getIdColumn();
+            _idColumn = getIdColumn();
         }
 
        /*
@@ -39,7 +41,7 @@ namespace CRUD_Automatico
                 string paramColunas = "";
                 for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (_nomeColunas[i].Equals(_id)) continue;
+                    if (_nomeColunas[i].Equals(_idColumn)) continue;
 
                     nomeColunas += _nomeColunas[i];
                     paramColunas += "@" + _nomeColunas[i];
@@ -80,7 +82,7 @@ namespace CRUD_Automatico
                 string set = "";
                 for (int i = 0; i < _nomeColunas.Count; i++)
                 {
-                    if (_nomeColunas[i].Equals(_id))
+                    if (_nomeColunas[i].Equals(_idColumn))
                         continue;
 
                     set += $"{_nomeColunas[i]} = @{_nomeColunas[i]}";
@@ -89,7 +91,7 @@ namespace CRUD_Automatico
                 }
 
                 var comando = new MySqlCommand(
-                    $"UPDATE {BDInfo.Table} SET {set} WHERE {_id} = {id};", _conxSql);
+                    $"UPDATE {BDInfo.Table} SET {set} WHERE {_idColumn} = {id};", _conxSql);
 
                 definirParametros(comando, values);
 
@@ -109,18 +111,20 @@ namespace CRUD_Automatico
         }
 
         // Excluir
-        public void Remover(int ID)
+        public bool Remover(int ID)
         {
             try
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"DELETE FROM {BDInfo.Table} WHERE {_id} = {ID}", _conxSql);
+                    $"DELETE FROM {BDInfo.Table} WHERE {_idColumn} = {ID}", _conxSql);
                 comando.ExecuteNonQuery();
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao remover do BD\n" + ex.Message);
+                return false;
             }
             finally
             {
@@ -135,9 +139,9 @@ namespace CRUD_Automatico
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
-                    $"SELECT * FROM {BDInfo.Table} WHERE {_id} = {ID};", _conxSql);
+                    $"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};", _conxSql);
 
-                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE {_id} = {ID};");
+                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};");
 
                 var reader = comando.ExecuteReader();
 
@@ -146,8 +150,11 @@ namespace CRUD_Automatico
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pesquisar no BD\n" + ex.Message);
-                _conxSql.Close();
                 return null;
+            }
+            finally
+            {
+                _conxSql.Close();
             }
         }
 
@@ -180,7 +187,7 @@ namespace CRUD_Automatico
             {
                 string coluna = _nomeColunas[i];
 
-                if (coluna.Equals(_id)) continue;
+                if (coluna.Equals(_idColumn)) continue;
 
                 if (getColumnType(coluna).Contains("date"))
                     values[coluna] = mudarFormatoData(values[coluna]);
@@ -380,7 +387,7 @@ namespace CRUD_Automatico
         // Outros
         //
 
-        // muda o formato da data americana (aaaa/MM/dd) para brasileira (dd/MM/aaaa)
+        // muda o formato da data brasileira (dd/MM/aaaa) para americana (aaaa/MM/dd)
         public string mudarFormatoData(string date)
         {
             if (date.Length < 11)

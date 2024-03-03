@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace CRUD_Automatico
 {
@@ -10,7 +11,7 @@ namespace CRUD_Automatico
         public Form1()
         {
             InitializeComponent();
-            var testaConexao = new Cadastro();
+            var testaConexao = new Cadastro(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             definirInputs();
             updateTabela();
@@ -46,7 +47,7 @@ namespace CRUD_Automatico
                     values.Add(i.Column, i.Value);
             }
 
-            adicionar = new Cadastro();
+            adicionar = new Cadastro(new MySqlConnection(BDInfo.Server));
             bool adicionado = adicionar.Adicionar(values);
             if (!adicionado)
             {
@@ -97,7 +98,7 @@ namespace CRUD_Automatico
 
             int id = int.Parse(stringId);
 
-            Cadastro update = new Cadastro();
+            Cadastro update = new Cadastro(new MySqlConnection(BDInfo.Server));
             bool atualizado = update.Update(values, id);
 
             if (!atualizado)
@@ -126,8 +127,14 @@ namespace CRUD_Automatico
         {
             int id = int.Parse(idSelecionado());
 
-            Cadastro excluir = new Cadastro();
-            excluir.Remover(id);
+            Cadastro excluir = new Cadastro(new MySqlConnection(BDInfo.Server));
+            bool removido = excluir.Remover(id);
+            if (!removido)
+            {
+                MessageBox.Show("Erro ao remover");
+                return;
+            }
+
             updateTabela();
 
             limparInputs();
@@ -171,7 +178,7 @@ namespace CRUD_Automatico
         // mostra os dados da tabela
         private void updateTabela()
         {
-            Cadastro pesquisar = new Cadastro();
+            Cadastro pesquisar = new Cadastro(new MySqlConnection(BDInfo.Server));
             var tabela = pesquisar.PesquisarTodos();
 
             DataTable dt = new DataTable();
@@ -210,7 +217,7 @@ namespace CRUD_Automatico
         // adiciona os inputs baseado nas colunas da tabela
         private void definirInputs()
         {
-            Cadastro c = new Cadastro();
+            Cadastro c = new Cadastro(new MySqlConnection(BDInfo.Server));
             var colunas = c.GetColumns();
 
             if(colunas == null)
@@ -229,7 +236,7 @@ namespace CRUD_Automatico
 
 
 
-        // muda visualmente os inputs para permitir a pesquisa por ID
+        // muda os inputs para permitir a pesquisa por ID
         private void modoPesquisa()
         {
             foreach (InputControl i in inptPainel.Controls)
@@ -244,7 +251,7 @@ namespace CRUD_Automatico
         // Pesquisa baseado no id fornecido
         private void pesquisar()
         {
-            Cadastro p = new Cadastro();
+            Cadastro p = new Cadastro(new MySqlConnection(BDInfo.Server));
 
             if (isIdEmpty())
             {
@@ -291,7 +298,7 @@ namespace CRUD_Automatico
 
         /*
          * 
-         *  Funcções auxiliares
+         *  Funções auxiliares
          *  
          */
 
