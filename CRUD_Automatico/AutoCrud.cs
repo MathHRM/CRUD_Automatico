@@ -141,19 +141,17 @@ namespace CRUD_Automatico
                 var comando = new MySqlCommand(
                     $"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};", _conxSql);
 
-                var reader = comando.ExecuteReader();
-
-                return reader;
+                return comando.ExecuteReader();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pesquisar no BD\n" + ex.Message);
                 return null;
             }
-            finally
+            /*finally
             {
                 _conxSql.Close();
-            }
+            }*/
         }
 
         // pesquisa todos os rows
@@ -197,6 +195,10 @@ namespace CRUD_Automatico
                 _conxSql.Close();
                 return null;
             }
+            /*finally
+            {
+                _conxSql.Close();
+            }*/
         }
 
         // Define os parametros e valores do comando sql

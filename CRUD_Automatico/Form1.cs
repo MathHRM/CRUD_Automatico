@@ -8,13 +8,17 @@ namespace CRUD_Automatico
 {
     public partial class Form1 : Form
     {
+        const int PAGINATION_SIZE = 10;
+        int paginationStart = 0;
+        int paginationEnd = PAGINATION_SIZE;
+
         public Form1()
         {
             InitializeComponent();
             var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             definirInputs();
-            updateTabela();
+            updateTabela(paginationStart, paginationEnd);
 
             inptCancelar.Visible = false;
             inptConfirmarEdicao.Visible = false;
@@ -55,14 +59,14 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTabela();
+            updateTabela(paginationStart, paginationEnd);
             limparInputs();
         }
 
         // Editar
         private void inptEditar_Click(object sender, EventArgs e)
         {
-            if (isIdEmpty())
+            if (IsIdInputEmpty())
             {
                 modoPesquisa();
                 return;
@@ -112,13 +116,13 @@ namespace CRUD_Automatico
 
             ativarBotoes();
             limparInputs();
-            updateTabela();
+            updateTabela(paginationStart, paginationEnd);
         }
 
         // Remover
         private void inptRemover_Click(object sender, EventArgs e)
         {
-            if (isIdEmpty())
+            if (IsIdInputEmpty())
             {
                 modoPesquisa();
             }
@@ -135,7 +139,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTabela();
+            updateTabela(paginationStart ,paginationEnd);
 
             limparInputs();
             ativarBotoes();
@@ -176,16 +180,21 @@ namespace CRUD_Automatico
          */
 
         // mostra os dados da tabela
-        private void updateTabela()
+        private int updateTabela(int start, int end)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            var tabela = pesquisar.GetInterval(0, 10);
+            var tabela = pesquisar.GetInterval(start, end);
 
             DataTable dt = new DataTable();
             dt.Load(tabela);
 
+            Console.WriteLine($"start = {start} /// end = {end}");
+            Console.WriteLine($"res length: {dt.Rows.Count}\n");
+
             dataGD.DataSource = dt;
             dataGD.AutoResizeColumns();
+
+            return dt.Rows.Count;
         }
 
         // muda os dados quando clicado na linha
@@ -253,7 +262,7 @@ namespace CRUD_Automatico
         {
             AutoCrud p = new AutoCrud(new MySqlConnection(BDInfo.Server));
 
-            if (isIdEmpty())
+            if (IsIdInputEmpty())
             {
                 MessageBox.Show("Digite um id");
                 return;
@@ -265,6 +274,7 @@ namespace CRUD_Automatico
                 MessageBox.Show("ID inválido");
                 return;
             }
+
             var resultado = p.SearchRow(id);
 
             if (resultado == null)
@@ -364,7 +374,7 @@ namespace CRUD_Automatico
             inptPesquisar.Visible = true;
         }
 
-        private bool isIdEmpty()
+        private bool IsIdInputEmpty()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
@@ -379,6 +389,33 @@ namespace CRUD_Automatico
                 if (i.isId) return i.Value;
             }
             return "";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            paginationStart = paginationEnd;
+            // +1 para ter a certeza q qnd retornar um numero de elementos igual
+            // a PAGINATION_SIZE, seja realmente o final da tabela
+            paginationEnd += PAGINATION_SIZE + 1; 
+            ButtonPreviousPage.Enabled = true;
+
+            int numberOfRows = updateTabela(paginationStart, paginationEnd);
+            
+            if(numberOfRows <= PAGINATION_SIZE)
+                ButtonNextPage.Enabled = false;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            paginationEnd = paginationStart;
+            paginationStart = paginationStart - PAGINATION_SIZE > 0 ? paginationStart - PAGINATION_SIZE -1 : 0;
+
+            if (paginationStart <= PAGINATION_SIZE/2)
+                ButtonPreviousPage.Enabled = false;
+
+            updateTabela(paginationStart, paginationEnd);
+            
+            ButtonNextPage.Enabled = true;
         }
     }
 }

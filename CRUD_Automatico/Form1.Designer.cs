@@ -38,6 +38,8 @@
             this.inptConfirmarEdicao = new System.Windows.Forms.Button();
             this.inptCancelar = new System.Windows.Forms.Button();
             this.inptConfirmarRemover = new System.Windows.Forms.Button();
+            this.ButtonNextPage = new System.Windows.Forms.Button();
+            this.ButtonPreviousPage = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).BeginInit();
             this.SuspendLayout();
             // 
@@ -140,11 +142,34 @@
             this.inptConfirmarRemover.UseVisualStyleBackColor = true;
             this.inptConfirmarRemover.Click += new System.EventHandler(this.inptConfirmarRemover_Click);
             // 
+            // ButtonNextPage
+            // 
+            this.ButtonNextPage.Location = new System.Drawing.Point(686, 473);
+            this.ButtonNextPage.Name = "ButtonNextPage";
+            this.ButtonNextPage.Size = new System.Drawing.Size(26, 23);
+            this.ButtonNextPage.TabIndex = 10;
+            this.ButtonNextPage.Text = ">";
+            this.ButtonNextPage.UseVisualStyleBackColor = true;
+            this.ButtonNextPage.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // ButtonPreviousPage
+            // 
+            this.ButtonPreviousPage.Enabled = false;
+            this.ButtonPreviousPage.Location = new System.Drawing.Point(654, 473);
+            this.ButtonPreviousPage.Name = "ButtonPreviousPage";
+            this.ButtonPreviousPage.Size = new System.Drawing.Size(26, 23);
+            this.ButtonPreviousPage.TabIndex = 11;
+            this.ButtonPreviousPage.Text = "<";
+            this.ButtonPreviousPage.UseVisualStyleBackColor = true;
+            this.ButtonPreviousPage.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(724, 498);
+            this.ClientSize = new System.Drawing.Size(724, 501);
+            this.Controls.Add(this.ButtonPreviousPage);
+            this.Controls.Add(this.ButtonNextPage);
             this.Controls.Add(this.inptConfirmarRemover);
             this.Controls.Add(this.inptCancelar);
             this.Controls.Add(this.inptConfirmarEdicao);
@@ -175,6 +200,8 @@
         private System.Windows.Forms.Button inptConfirmarEdicao;
         private System.Windows.Forms.Button inptCancelar;
         private System.Windows.Forms.Button inptConfirmarRemover;
+        private System.Windows.Forms.Button ButtonNextPage;
+        private System.Windows.Forms.Button ButtonPreviousPage;
     }
 }
 
