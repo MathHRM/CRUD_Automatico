@@ -50,7 +50,7 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    values.Add(i.Column, i.InputText);
+                    values.Add(i.Column, i.Text);
             }
 
             adicionar = new AutoCrud(new MySqlConnection(BDInfo.Server));
@@ -96,9 +96,9 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    values.Add(i.Column, i.InputText);
+                    values.Add(i.Column, i.Text);
                 else
-                    stringId = i.InputText;
+                    stringId = i.Text;
             }
 
 
@@ -218,7 +218,12 @@ namespace CRUD_Automatico
 
             for (int i = 0; i < dataGD.Columns.Count; i++)
             {
-                Name_InputsPair[dataGD.Columns[i].Name].InputText = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[i].Value.ToString();
+                string columnName = dataGD.Columns[i].Name;
+                InputControl input = Name_InputsPair[columnName];
+                int idFromSelectedRow = dataGD.SelectedRows[0].Index;
+                int indexOfCurrentColumn = i;
+
+                input.Text = dataGD.Rows[idFromSelectedRow].Cells[indexOfCurrentColumn].Value.ToString();
             }
         }
 
@@ -296,7 +301,7 @@ namespace CRUD_Automatico
 
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.InputText = row[0][i.Column].ToString();
+                i.Text = row[0][i.Column].ToString();
             }
 
             desativarInputs();
@@ -325,7 +330,7 @@ namespace CRUD_Automatico
                 if (!inpt.isId)
                     continue;
 
-                if (!inpt.IsNullable && inpt.InputText.Equals(string.Empty))
+                if (!inpt.IsNullable && inpt.Text.Equals(string.Empty))
                     return false;
 
                 if (!inpt.MascaraCompleta)
@@ -338,7 +343,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.InputText = string.Empty;
+                i.Text = string.Empty;
             }
         }
         private void desativarInputs()
@@ -375,7 +380,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.InputText == string.Empty;
+                if (i.isId) return i.Text == string.Empty;
             }
             return false;
         }
@@ -383,7 +388,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.InputText;
+                if (i.isId) return i.Text;
             }
             return "";
         }
