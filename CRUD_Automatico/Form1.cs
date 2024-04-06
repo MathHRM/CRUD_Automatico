@@ -12,13 +12,15 @@ namespace CRUD_Automatico
         int paginationStart = 0;
         int paginationEnd = PAGINATION_SIZE;
 
+        Dictionary<string, InputControl> Name_InputsPair = new Dictionary<string, InputControl>();
+
         public Form1()
         {
             InitializeComponent();
             var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
-            definirInputs();
-            updateTabela(paginationStart, paginationEnd);
+            defineInputs();
+            updateTable(paginationStart, paginationEnd);
 
             inptCancelar.Visible = false;
             inptConfirmarEdicao.Visible = false;
@@ -48,7 +50,7 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    values.Add(i.Column, i.Value);
+                    values.Add(i.Column, i.InputText);
             }
 
             adicionar = new AutoCrud(new MySqlConnection(BDInfo.Server));
@@ -59,7 +61,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTabela(paginationStart, paginationEnd);
+            updateTable(paginationStart, paginationEnd);
             limparInputs();
         }
 
@@ -94,9 +96,9 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    values.Add(i.Column, i.Value);
+                    values.Add(i.Column, i.InputText);
                 else
-                    stringId = i.Value;
+                    stringId = i.InputText;
             }
 
 
@@ -116,7 +118,7 @@ namespace CRUD_Automatico
 
             ativarBotoes();
             limparInputs();
-            updateTabela(paginationStart, paginationEnd);
+            updateTable(paginationStart, paginationEnd);
         }
 
         // Remover
@@ -139,7 +141,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTabela(paginationStart ,paginationEnd);
+            updateTable(paginationStart ,paginationEnd);
 
             limparInputs();
             ativarBotoes();
@@ -180,7 +182,7 @@ namespace CRUD_Automatico
          */
 
         // mostra os dados da tabela
-        private int updateTabela(int start, int end)
+        private int updateTable(int start, int end)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
             var tabela = pesquisar.GetInterval(start, end);
@@ -214,17 +216,16 @@ namespace CRUD_Automatico
             if (idRowSelecionado == null)
                 return;
 
-            foreach (InputControl i in inptPainel.Controls)
+            for (int i = 0; i < dataGD.Columns.Count; i++)
             {
-                if (i.isId) i.Value = idRowSelecionado.ToString();
+                Name_InputsPair[dataGD.Columns[i].Name].InputText = dataGD.Rows[dataGD.SelectedRows[0].Index].Cells[i].Value.ToString();
             }
-            pesquisar();
         }
 
 
 
         // adiciona os inputs baseado nas colunas da tabela
-        private void definirInputs()
+        private void defineInputs()
         {
             AutoCrud c = new AutoCrud(new MySqlConnection(BDInfo.Server));
             var colunas = c.GetColumnsInformations();
@@ -239,6 +240,7 @@ namespace CRUD_Automatico
             {
                 InputControl input = new InputControl(colunas[nomeCol]);
 
+                Name_InputsPair.Add( nomeCol, input );
                 inptPainel.Controls.Add(input);
             }
         }
@@ -272,28 +274,29 @@ namespace CRUD_Automatico
             if (!int.TryParse(idSelecionado(), out id))
             {
                 MessageBox.Show("ID inválido");
+                limparInputs();
                 return;
             }
 
-            var resultado = p.SearchRow(id);
+            var row = p.SearchRow(id).Rows;
 
-            if (resultado == null)
+            if (row == null)
             {
                 MessageBox.Show("Funcionario não encontrado: erro");
+                limparInputs();
                 return;
             }
 
-            if (!resultado.HasRows)
+            if (row.Count == 0)
             {
                 MessageBox.Show("Funcionario não encontrado: sem dados");
+                limparInputs();
                 return;
             }
-
-            resultado.Read();
 
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.Value = resultado[i.Column].ToString();
+                i.InputText = row[0][i.Column].ToString();
             }
 
             desativarInputs();
@@ -315,8 +318,6 @@ namespace CRUD_Automatico
         // verifica se os inputs obrigatorios foram preenchidos
         private bool inputsPreenchidos()
         {
-            bool preenchidos = true;
-
             for (int i = 0; i < inptPainel.Controls.Count; i++)
             {
                 InputControl inpt = (InputControl)inptPainel.Controls[i];
@@ -324,24 +325,20 @@ namespace CRUD_Automatico
                 if (!inpt.isId)
                     continue;
 
-                if (!inpt.IsNullable && inpt.Value.Equals(string.Empty))
-                {
-                    preenchidos = false;
-                    continue;
-                }
+                if (!inpt.IsNullable && inpt.InputText.Equals(string.Empty))
+                    return false;
 
                 if (!inpt.MascaraCompleta)
-                    preenchidos = false;
+                    return false;
             }
-
-            return preenchidos;
+            return true;
         }
 
         private void limparInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.Value = string.Empty;
+                i.InputText = string.Empty;
             }
         }
         private void desativarInputs()
@@ -378,7 +375,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.Value == string.Empty;
+                if (i.isId) return i.InputText == string.Empty;
             }
             return false;
         }
@@ -386,7 +383,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                if (i.isId) return i.Value;
+                if (i.isId) return i.InputText;
             }
             return "";
         }
@@ -399,7 +396,7 @@ namespace CRUD_Automatico
             paginationEnd += PAGINATION_SIZE + 1; 
             ButtonPreviousPage.Enabled = true;
 
-            int numberOfRows = updateTabela(paginationStart, paginationEnd);
+            int numberOfRows = updateTable(paginationStart, paginationEnd);
             
             if(numberOfRows <= PAGINATION_SIZE)
                 ButtonNextPage.Enabled = false;
@@ -413,7 +410,7 @@ namespace CRUD_Automatico
             if (paginationStart <= PAGINATION_SIZE/2)
                 ButtonPreviousPage.Enabled = false;
 
-            updateTabela(paginationStart, paginationEnd);
+            updateTable(paginationStart, paginationEnd);
             
             ButtonNextPage.Enabled = true;
         }

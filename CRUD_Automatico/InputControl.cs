@@ -7,7 +7,7 @@ namespace CRUD_Automatico
         private string _colRef;
         public string Column { get { return _colRef; } }
 
-        public string Value
+        public string InputText
         {
             get { return inpt.Text; }
             set { inpt.Text = value; }

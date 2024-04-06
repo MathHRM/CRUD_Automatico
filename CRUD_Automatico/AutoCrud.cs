@@ -133,7 +133,7 @@ namespace CRUD_Automatico
         }
 
         // pesquisa um row pelo id
-        public MySqlDataReader SearchRow(int ID)
+        public DataTable SearchRow(int ID)
         {
             try
             {
@@ -141,17 +141,24 @@ namespace CRUD_Automatico
                 var comando = new MySqlCommand(
                     $"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};", _conxSql);
 
-                return comando.ExecuteReader();
+                var reader = comando.ExecuteReader();
+
+                var dt = new DataTable();
+                dt.Load(reader);
+
+                reader.Close();
+
+                return dt;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao pesquisar no BD\n" + ex.Message);
                 return null;
             }
-            /*finally
+            finally
             {
                 _conxSql.Close();
-            }*/
+            }
         }
 
         // pesquisa todos os rows
