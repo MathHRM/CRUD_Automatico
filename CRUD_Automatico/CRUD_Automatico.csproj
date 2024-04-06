@@ -99,7 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BDInfo.cs" />
-    <Compile Include="Cadastro.cs" />
+    <Compile Include="AutoCrud.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

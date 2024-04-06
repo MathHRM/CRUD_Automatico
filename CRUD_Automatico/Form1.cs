@@ -11,7 +11,7 @@ namespace CRUD_Automatico
         public Form1()
         {
             InitializeComponent();
-            var testaConexao = new Cadastro(new MySqlConnection(BDInfo.Server));
+            var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             definirInputs();
             updateTabela();
@@ -33,7 +33,7 @@ namespace CRUD_Automatico
         private void inptAdicionar_Click(object sender, EventArgs e)
         {
             var values = new Dictionary<string, string>();
-            Cadastro adicionar;
+            AutoCrud adicionar;
 
             if (!inputsPreenchidos())
             {
@@ -47,8 +47,8 @@ namespace CRUD_Automatico
                     values.Add(i.Column, i.Value);
             }
 
-            adicionar = new Cadastro(new MySqlConnection(BDInfo.Server));
-            bool adicionado = adicionar.Adicionar(values);
+            adicionar = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            bool adicionado = adicionar.Add(values);
             if (!adicionado)
             {
                 MessageBox.Show("Erro ao adicionar, verifique os dados e tente novamente");
@@ -98,7 +98,7 @@ namespace CRUD_Automatico
 
             int id = int.Parse(stringId);
 
-            Cadastro update = new Cadastro(new MySqlConnection(BDInfo.Server));
+            AutoCrud update = new AutoCrud(new MySqlConnection(BDInfo.Server));
             bool atualizado = update.Update(values, id);
 
             if (!atualizado)
@@ -127,8 +127,8 @@ namespace CRUD_Automatico
         {
             int id = int.Parse(idSelecionado());
 
-            Cadastro excluir = new Cadastro(new MySqlConnection(BDInfo.Server));
-            bool removido = excluir.Remover(id);
+            AutoCrud excluir = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            bool removido = excluir.Remove(id);
             if (!removido)
             {
                 MessageBox.Show("Erro ao remover");
@@ -178,8 +178,8 @@ namespace CRUD_Automatico
         // mostra os dados da tabela
         private void updateTabela()
         {
-            Cadastro pesquisar = new Cadastro(new MySqlConnection(BDInfo.Server));
-            var tabela = pesquisar.PesquisarTodos();
+            AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            var tabela = pesquisar.GetInterval(0, 10);
 
             DataTable dt = new DataTable();
             dt.Load(tabela);
@@ -217,8 +217,8 @@ namespace CRUD_Automatico
         // adiciona os inputs baseado nas colunas da tabela
         private void definirInputs()
         {
-            Cadastro c = new Cadastro(new MySqlConnection(BDInfo.Server));
-            var colunas = c.GetColumns();
+            AutoCrud c = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            var colunas = c.GetColumnsInformations();
 
             if(colunas == null)
             {
@@ -251,7 +251,7 @@ namespace CRUD_Automatico
         // Pesquisa baseado no id fornecido
         private void pesquisar()
         {
-            Cadastro p = new Cadastro(new MySqlConnection(BDInfo.Server));
+            AutoCrud p = new AutoCrud(new MySqlConnection(BDInfo.Server));
 
             if (isIdEmpty())
             {
@@ -265,11 +265,11 @@ namespace CRUD_Automatico
                 MessageBox.Show("ID inválido");
                 return;
             }
-            var resultado = p.Pesquisar(id);
+            var resultado = p.SearchRow(id);
 
             if (resultado == null)
             {
-                MessageBox.Show("Funcionario não encontrado: não existe");
+                MessageBox.Show("Funcionario não encontrado: erro");
                 return;
             }
 

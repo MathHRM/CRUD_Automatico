@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace CRUD_Automatico
 {
-    internal class Cadastro
+    internal class AutoCrud
     {
         private MySqlConnection _conxSql;
 
@@ -16,22 +16,22 @@ namespace CRUD_Automatico
         private string _idColumn;
         public string ID { get { return _idColumn; } }
 
-        public Cadastro(MySqlConnection conxSql)
+        public AutoCrud(MySqlConnection conxSql)
         {
             _conxSql = conxSql;
 
-            _nomeColunas = getColumnNames();
-            _idColumn = getIdColumn();
+            _nomeColunas = GetColumnNames();
+            _idColumn = GetTheIdColumn();
         }
 
        /*
         * 
-        *  Funcções CRUD
+        *  Funções CRUD
         *  
         */
 
         // Adicionar
-        public bool Adicionar(Dictionary<string, string> values)
+        public bool Add(Dictionary<string, string> values)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace CRUD_Automatico
                 var comando = new MySqlCommand(
                     $"INSERT INTO {BDInfo.Table} ({nomeColunas}) values ({paramColunas});", _conxSql);
 
-                definirParametros(comando, values);
+                DefineParameters(comando, values);
 
                 comando.ExecuteNonQuery();
                 return true;
@@ -93,7 +93,7 @@ namespace CRUD_Automatico
                 var comando = new MySqlCommand(
                     $"UPDATE {BDInfo.Table} SET {set} WHERE {_idColumn} = {id};", _conxSql);
 
-                definirParametros(comando, values);
+                DefineParameters(comando, values);
 
                 comando.ExecuteNonQuery();
                 _conxSql.Close();
@@ -111,7 +111,7 @@ namespace CRUD_Automatico
         }
 
         // Excluir
-        public bool Remover(int ID)
+        public bool Remove(int ID)
         {
             try
             {
@@ -133,15 +133,13 @@ namespace CRUD_Automatico
         }
 
         // pesquisa um row pelo id
-        public MySqlDataReader Pesquisar(int ID)
+        public MySqlDataReader SearchRow(int ID)
         {
             try
             {
                 _conxSql.Open();
                 var comando = new MySqlCommand(
                     $"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};", _conxSql);
-
-                Console.WriteLine($"SELECT * FROM {BDInfo.Table} WHERE {_idColumn} = {ID};");
 
                 var reader = comando.ExecuteReader();
 
@@ -159,7 +157,7 @@ namespace CRUD_Automatico
         }
 
         // pesquisa todos os rows
-        public MySqlDataReader PesquisarTodos()
+        public MySqlDataReader GetAllData()
         {
             try
             {
@@ -180,8 +178,29 @@ namespace CRUD_Automatico
             }
         }
 
+        public MySqlDataReader GetInterval(int start, int end)
+        {
+            try
+            {
+                _conxSql.Open();
+
+                var comando = new MySqlCommand(
+                    $"SELECT * FROM {BDInfo.Table} ORDER BY {_idColumn} LIMIT {end} OFFSET {start};", _conxSql);
+
+                var reader = comando.ExecuteReader();
+
+                return reader;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao pesquisar todos no BD\n" + ex.Message);
+                _conxSql.Close();
+                return null;
+            }
+        }
+
         // Define os parametros e valores do comando sql
-        private void definirParametros(MySqlCommand comando, Dictionary<string, string> values)
+        private void DefineParameters(MySqlCommand comando, Dictionary<string, string> values)
         {
             for (int i = 0; i < _nomeColunas.Count; i++)
             {
@@ -189,8 +208,8 @@ namespace CRUD_Automatico
 
                 if (coluna.Equals(_idColumn)) continue;
 
-                if (getColumnType(coluna).Contains("date"))
-                    values[coluna] = mudarFormatoData(values[coluna]);
+                if (GetColumnType(coluna).Contains("date"))
+                    values[coluna] = ChangeDateFormat(values[coluna]);
 
                 var paramColuna = $"@{coluna}";
 
@@ -207,7 +226,7 @@ namespace CRUD_Automatico
          */
 
         // retorna um dicionario com o nome e dados de todas as colunas
-        public Dictionary<string, MySqlColumn> GetColumns()
+        public Dictionary<string, MySqlColumn> GetColumnsInformations()
         {
             try
             {
@@ -258,7 +277,7 @@ namespace CRUD_Automatico
         }
 
         // retorna uma lista com o nome de todas as colunas
-        public List<string> getColumnNames()
+        public List<string> GetColumnNames()
         {
             try
             {
@@ -293,7 +312,7 @@ namespace CRUD_Automatico
         }
 
         // retorna os dados da coluna pelo nome
-        public MySqlColumn getColumn(string col)
+        public MySqlColumn GetColumnInformation(string col)
         {
             try
             {
@@ -326,7 +345,7 @@ namespace CRUD_Automatico
         }
 
         // retorna em string o data type da coluna
-        private string getColumnType(string col)
+        private string GetColumnType(string col)
         {
             try
             {
@@ -352,7 +371,7 @@ namespace CRUD_Automatico
         }
 
         // retorna o nome da coluna id (chave primaria)
-        private string getIdColumn()
+        private string GetTheIdColumn()
         {
             try
             {
@@ -388,7 +407,7 @@ namespace CRUD_Automatico
         //
 
         // muda o formato da data brasileira (dd/MM/aaaa) para americana (aaaa/MM/dd)
-        public string mudarFormatoData(string date)
+        public string ChangeDateFormat(string date)
         {
             if (date.Length < 11)
                 return DateTime.Parse(date).ToString("yyyy/MM/dd");
