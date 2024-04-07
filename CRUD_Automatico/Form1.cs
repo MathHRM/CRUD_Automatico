@@ -399,10 +399,11 @@ namespace CRUD_Automatico
             ButtonPreviousPage.Enabled = true;
 
             int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
-            Console.WriteLine("Next retornou: " +numberOfRows);
             
             if(numberOfRows < PAGINATION_SIZE)
                 ButtonNextPage.Enabled = false;
+            
+            PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) +1}";
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -414,9 +415,21 @@ namespace CRUD_Automatico
             if (paginationStart < PAGINATION_SIZE)
                 ButtonPreviousPage.Enabled = false;
 
-            Console.WriteLine("Prev retornou: " + updateTable(paginationStart, PAGINATION_SIZE));
-            
             ButtonNextPage.Enabled = true;
+
+            updateTable(paginationStart, PAGINATION_SIZE);
+
+            PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) + 1}";
+        }
+
+        private void PageNumerator_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+
+            
         }
     }
 }

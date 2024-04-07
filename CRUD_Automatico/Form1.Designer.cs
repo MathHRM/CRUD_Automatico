@@ -40,6 +40,7 @@
             this.inptConfirmarRemover = new System.Windows.Forms.Button();
             this.ButtonNextPage = new System.Windows.Forms.Button();
             this.ButtonPreviousPage = new System.Windows.Forms.Button();
+            this.PageNumerator = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).BeginInit();
             this.SuspendLayout();
             // 
@@ -155,7 +156,7 @@
             // ButtonPreviousPage
             // 
             this.ButtonPreviousPage.Enabled = false;
-            this.ButtonPreviousPage.Location = new System.Drawing.Point(654, 473);
+            this.ButtonPreviousPage.Location = new System.Drawing.Point(622, 473);
             this.ButtonPreviousPage.Name = "ButtonPreviousPage";
             this.ButtonPreviousPage.Size = new System.Drawing.Size(26, 23);
             this.ButtonPreviousPage.TabIndex = 11;
@@ -163,11 +164,23 @@
             this.ButtonPreviousPage.UseVisualStyleBackColor = true;
             this.ButtonPreviousPage.Click += new System.EventHandler(this.button2_Click);
             // 
+            // PageNumerator
+            // 
+            this.PageNumerator.Location = new System.Drawing.Point(654, 475);
+            this.PageNumerator.Name = "PageNumerator";
+            this.PageNumerator.ReadOnly = true;
+            this.PageNumerator.Size = new System.Drawing.Size(26, 20);
+            this.PageNumerator.TabIndex = 12;
+            this.PageNumerator.Text = "1";
+            this.PageNumerator.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.PageNumerator.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.PageNumerator_KeyPress);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(724, 501);
+            this.Controls.Add(this.PageNumerator);
             this.Controls.Add(this.ButtonPreviousPage);
             this.Controls.Add(this.ButtonNextPage);
             this.Controls.Add(this.inptConfirmarRemover);
@@ -185,6 +198,7 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGD)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -202,6 +216,7 @@
         private System.Windows.Forms.Button inptConfirmarRemover;
         private System.Windows.Forms.Button ButtonNextPage;
         private System.Windows.Forms.Button ButtonPreviousPage;
+        private System.Windows.Forms.TextBox PageNumerator;
     }
 }
 
