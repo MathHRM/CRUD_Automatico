@@ -10,7 +10,6 @@ namespace CRUD_Automatico
     {
         const int PAGINATION_SIZE = 10;
         int paginationStart = 0;
-        int paginationEnd = PAGINATION_SIZE;
 
         Dictionary<string, InputControl> Name_InputsPair = new Dictionary<string, InputControl>();
 
@@ -20,7 +19,7 @@ namespace CRUD_Automatico
             var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             defineInputs();
-            updateTable(paginationStart, paginationEnd);
+            updateTable(paginationStart, PAGINATION_SIZE);
 
             inptCancelar.Visible = false;
             inptConfirmarEdicao.Visible = false;
@@ -61,7 +60,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart, paginationEnd);
+            updateTable(paginationStart, PAGINATION_SIZE);
             ClearInputs();
         }
 
@@ -118,7 +117,7 @@ namespace CRUD_Automatico
 
             ActivateButtons();
             ClearInputs();
-            updateTable(paginationStart, paginationEnd);
+            updateTable(paginationStart, PAGINATION_SIZE);
         }
 
         // Remover
@@ -141,7 +140,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart ,paginationEnd);
+            updateTable(paginationStart ,PAGINATION_SIZE);
 
             ClearInputs();
             ActivateButtons();
@@ -182,10 +181,10 @@ namespace CRUD_Automatico
          */
 
         // mostra os dados da tabela
-        private int updateTable(int start, int end)
+        private int updateTable(int start, int limit)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            DataTable dt = pesquisar.GetInterval(start, end);
+            DataTable dt = pesquisar.GetInterval(start, limit);
 
             dataGD.DataSource = dt;
             dataGD.AutoResizeColumns();
@@ -396,27 +395,26 @@ namespace CRUD_Automatico
 
         private void button1_Click(object sender, EventArgs e)
         {
-            paginationStart = paginationEnd;
-            // +1 para ter a certeza q qnd retornar um numero de elementos igual
-            // a PAGINATION_SIZE, seja realmente o final da tabela
-            paginationEnd += PAGINATION_SIZE + 1; 
+            paginationStart += PAGINATION_SIZE;
             ButtonPreviousPage.Enabled = true;
 
-            int numberOfRows = updateTable(paginationStart, paginationEnd);
+            int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
+            Console.WriteLine("Next retornou: " +numberOfRows);
             
-            if(numberOfRows <= PAGINATION_SIZE)
+            if(numberOfRows < PAGINATION_SIZE)
                 ButtonNextPage.Enabled = false;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            paginationEnd = paginationStart;
-            paginationStart = paginationStart - PAGINATION_SIZE > 0 ? paginationStart - PAGINATION_SIZE -1 : 0;
+            paginationStart = paginationStart - PAGINATION_SIZE >= 0
+                ? paginationStart - PAGINATION_SIZE 
+                : 0;
 
-            if (paginationStart <= PAGINATION_SIZE/2)
+            if (paginationStart < PAGINATION_SIZE)
                 ButtonPreviousPage.Enabled = false;
 
-            updateTable(paginationStart, paginationEnd);
+            Console.WriteLine("Prev retornou: " + updateTable(paginationStart, PAGINATION_SIZE));
             
             ButtonNextPage.Enabled = true;
         }

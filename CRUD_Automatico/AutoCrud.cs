@@ -197,10 +197,10 @@ namespace CRUD_Automatico
             }
         }
 
-        public DataTable GetInterval(int start, int end)
+        public DataTable GetInterval(int start, int limit)
         {
             var comando = new MySqlCommand(
-                $"SELECT * FROM {BDInfo.Table} ORDER BY {_idColumn} LIMIT {end} OFFSET {start};",
+                $"SELECT * FROM {BDInfo.Table} ORDER BY {_idColumn} LIMIT {limit} OFFSET {start};",
                 _conxSql);
 
             try
