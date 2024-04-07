@@ -41,7 +41,7 @@ namespace CRUD_Automatico
             var values = new Dictionary<string, string>();
             AutoCrud adicionar;
 
-            if (!inputsPreenchidos())
+            if (!IsInputsFilleds())
             {
                 MessageBox.Show("Preencha todos os campos");
                 return;
@@ -62,7 +62,7 @@ namespace CRUD_Automatico
             }
 
             updateTable(paginationStart, paginationEnd);
-            limparInputs();
+            ClearInputs();
         }
 
         // Editar
@@ -70,13 +70,13 @@ namespace CRUD_Automatico
         {
             if (IsIdInputEmpty())
             {
-                modoPesquisa();
+                SearchMode();
                 return;
             }
 
             // caso clicado após uma pesquisa irá editar o resultado
-            desativarBotoes();
-            ativarInputs();
+            DesactivateButtons();
+            ActivateInputs();
 
             inptCancelar.Visible = true;
             inptConfirmarRemover.Visible = false;
@@ -87,7 +87,7 @@ namespace CRUD_Automatico
             var values = new Dictionary<string, string>();
             string stringId = "";
 
-            if (!inputsPreenchidos())
+            if (!IsInputsFilleds())
             {
                 MessageBox.Show("Preencha todos os campos");
                 return;
@@ -116,8 +116,8 @@ namespace CRUD_Automatico
             inptConfirmarEdicao.Visible = false;
             inptCancelar.Visible = false;
 
-            ativarBotoes();
-            limparInputs();
+            ActivateButtons();
+            ClearInputs();
             updateTable(paginationStart, paginationEnd);
         }
 
@@ -126,12 +126,12 @@ namespace CRUD_Automatico
         {
             if (IsIdInputEmpty())
             {
-                modoPesquisa();
+                SearchMode();
             }
         }
         private void inptConfirmarRemover_Click(object sender, EventArgs e)
         {
-            int id = int.Parse(idSelecionado());
+            int id = int.Parse(SelectedId());
 
             AutoCrud excluir = new AutoCrud(new MySqlConnection(BDInfo.Server));
             bool removido = excluir.Remove(id);
@@ -143,9 +143,9 @@ namespace CRUD_Automatico
 
             updateTable(paginationStart ,paginationEnd);
 
-            limparInputs();
-            ativarBotoes();
-            ativarInputs();
+            ClearInputs();
+            ActivateButtons();
+            ActivateInputs();
             inptConfirmarRemover.Visible = false;
             inptCancelar.Visible = false;
         }
@@ -153,19 +153,19 @@ namespace CRUD_Automatico
         // Pesquisar
         private void inptPesquisar_Click(object sender, EventArgs e)
         {
-            modoPesquisa();
+            SearchMode();
         }
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
-            pesquisar();
+            Search();
         }
 
         // Cancelar
         private void inptCancelar_Click(object sender, EventArgs e)
         {
-            ativarInputs();
-            ativarBotoes();
-            limparInputs();
+            ActivateInputs();
+            ActivateButtons();
+            ClearInputs();
 
             inptConfirmarEdicao.Visible = false;
             inptConfirmarPesquisa.Visible = false;
@@ -185,13 +185,7 @@ namespace CRUD_Automatico
         private int updateTable(int start, int end)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            var tabela = pesquisar.GetInterval(start, end);
-
-            DataTable dt = new DataTable();
-            dt.Load(tabela);
-
-            Console.WriteLine($"start = {start} /// end = {end}");
-            Console.WriteLine($"res length: {dt.Rows.Count}\n");
+            DataTable dt = pesquisar.GetInterval(start, end);
 
             dataGD.DataSource = dt;
             dataGD.AutoResizeColumns();
@@ -225,6 +219,13 @@ namespace CRUD_Automatico
 
                 input.Text = dataGD.Rows[idFromSelectedRow].Cells[indexOfCurrentColumn].Value.ToString();
             }
+
+            DesativateInputs();
+            DesactivateButtons();
+            inptConfirmarPesquisa.Visible = false;
+            inptEditar.Visible = true;
+            inptCancelar.Visible = true;
+            inptConfirmarRemover.Visible = true;
         }
 
 
@@ -253,19 +254,19 @@ namespace CRUD_Automatico
 
 
         // muda os inputs para permitir a pesquisa por ID
-        private void modoPesquisa()
+        private void SearchMode()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.setReadOnly(!i.isId);
             }
-            desativarBotoes();
+            DesactivateButtons();
             inptConfirmarPesquisa.Visible = true;
             inptCancelar.Visible = true;
         }
 
         // Pesquisa baseado no id fornecido
-        private void pesquisar()
+        private void Search()
         {
             AutoCrud p = new AutoCrud(new MySqlConnection(BDInfo.Server));
 
@@ -276,10 +277,10 @@ namespace CRUD_Automatico
             }
 
             int id;
-            if (!int.TryParse(idSelecionado(), out id))
+            if (!int.TryParse(SelectedId(), out id))
             {
                 MessageBox.Show("ID inválido");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
@@ -288,14 +289,14 @@ namespace CRUD_Automatico
             if (row == null)
             {
                 MessageBox.Show("Funcionario não encontrado: erro");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
             if (row.Count == 0)
             {
                 MessageBox.Show("Funcionario não encontrado: sem dados");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
@@ -304,8 +305,8 @@ namespace CRUD_Automatico
                 i.Text = row[0][i.Column].ToString();
             }
 
-            desativarInputs();
-            desativarBotoes();
+            DesativateInputs();
+            DesactivateButtons();
             inptConfirmarPesquisa.Visible = false;
             inptEditar.Visible = true;
             inptCancelar.Visible = true;
@@ -321,13 +322,13 @@ namespace CRUD_Automatico
          */
 
         // verifica se os inputs obrigatorios foram preenchidos
-        private bool inputsPreenchidos()
+        private bool IsInputsFilleds()
         {
             for (int i = 0; i < inptPainel.Controls.Count; i++)
             {
                 InputControl inpt = (InputControl)inptPainel.Controls[i];
 
-                if (!inpt.isId)
+                if (inpt.isId)
                     continue;
 
                 if (!inpt.IsNullable && inpt.Text.Equals(string.Empty))
@@ -339,21 +340,21 @@ namespace CRUD_Automatico
             return true;
         }
 
-        private void limparInputs()
+        private void ClearInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.Text = string.Empty;
             }
         }
-        private void desativarInputs()
+        private void DesativateInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.setReadOnly(true);
             }
         }
-        private void ativarInputs()
+        private void ActivateInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
@@ -361,14 +362,14 @@ namespace CRUD_Automatico
                     i.setReadOnly(false);
             }
         }
-        private void desativarBotoes()
+        private void DesactivateButtons()
         {
             inptAdicionar.Visible = false;
             inptEditar.Visible = false;
             inptRemover.Visible = false;
             inptPesquisar.Visible = false;
         }
-        private void ativarBotoes()
+        private void ActivateButtons()
         {
             inptAdicionar.Visible = true;
             inptEditar.Visible = true;
@@ -384,7 +385,7 @@ namespace CRUD_Automatico
             }
             return false;
         }
-        private string idSelecionado()
+        private string SelectedId()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
