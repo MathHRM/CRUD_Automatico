@@ -10,7 +10,6 @@ namespace CRUD_Automatico
     {
         const int PAGINATION_SIZE = 10;
         int paginationStart = 0;
-        int paginationEnd = PAGINATION_SIZE;
 
         Dictionary<string, InputControl> Name_InputsPair = new Dictionary<string, InputControl>();
 
@@ -20,7 +19,7 @@ namespace CRUD_Automatico
             var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             defineInputs();
-            updateTable(paginationStart, paginationEnd);
+            updateTable(paginationStart, PAGINATION_SIZE);
 
             inptCancelar.Visible = false;
             inptConfirmarEdicao.Visible = false;
@@ -41,7 +40,7 @@ namespace CRUD_Automatico
             var values = new Dictionary<string, string>();
             AutoCrud adicionar;
 
-            if (!inputsPreenchidos())
+            if (!IsInputsFilleds())
             {
                 MessageBox.Show("Preencha todos os campos");
                 return;
@@ -61,8 +60,8 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart, paginationEnd);
-            limparInputs();
+            updateTable(paginationStart, PAGINATION_SIZE);
+            ClearInputs();
         }
 
         // Editar
@@ -70,13 +69,13 @@ namespace CRUD_Automatico
         {
             if (IsIdInputEmpty())
             {
-                modoPesquisa();
+                SearchMode();
                 return;
             }
 
             // caso clicado após uma pesquisa irá editar o resultado
-            desativarBotoes();
-            ativarInputs();
+            DesactivateButtons();
+            ActivateInputs();
 
             inptCancelar.Visible = true;
             inptConfirmarRemover.Visible = false;
@@ -87,7 +86,7 @@ namespace CRUD_Automatico
             var values = new Dictionary<string, string>();
             string stringId = "";
 
-            if (!inputsPreenchidos())
+            if (!IsInputsFilleds())
             {
                 MessageBox.Show("Preencha todos os campos");
                 return;
@@ -116,9 +115,9 @@ namespace CRUD_Automatico
             inptConfirmarEdicao.Visible = false;
             inptCancelar.Visible = false;
 
-            ativarBotoes();
-            limparInputs();
-            updateTable(paginationStart, paginationEnd);
+            ActivateButtons();
+            ClearInputs();
+            updateTable(paginationStart, PAGINATION_SIZE);
         }
 
         // Remover
@@ -126,12 +125,12 @@ namespace CRUD_Automatico
         {
             if (IsIdInputEmpty())
             {
-                modoPesquisa();
+                SearchMode();
             }
         }
         private void inptConfirmarRemover_Click(object sender, EventArgs e)
         {
-            int id = int.Parse(idSelecionado());
+            int id = int.Parse(SelectedId());
 
             AutoCrud excluir = new AutoCrud(new MySqlConnection(BDInfo.Server));
             bool removido = excluir.Remove(id);
@@ -141,11 +140,11 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart ,paginationEnd);
+            updateTable(paginationStart ,PAGINATION_SIZE);
 
-            limparInputs();
-            ativarBotoes();
-            ativarInputs();
+            ClearInputs();
+            ActivateButtons();
+            ActivateInputs();
             inptConfirmarRemover.Visible = false;
             inptCancelar.Visible = false;
         }
@@ -153,19 +152,19 @@ namespace CRUD_Automatico
         // Pesquisar
         private void inptPesquisar_Click(object sender, EventArgs e)
         {
-            modoPesquisa();
+            SearchMode();
         }
         private void inptConfirmarPesquisa_Click(object sender, EventArgs e)
         {
-            pesquisar();
+            Search();
         }
 
         // Cancelar
         private void inptCancelar_Click(object sender, EventArgs e)
         {
-            ativarInputs();
-            ativarBotoes();
-            limparInputs();
+            ActivateInputs();
+            ActivateButtons();
+            ClearInputs();
 
             inptConfirmarEdicao.Visible = false;
             inptConfirmarPesquisa.Visible = false;
@@ -182,16 +181,10 @@ namespace CRUD_Automatico
          */
 
         // mostra os dados da tabela
-        private int updateTable(int start, int end)
+        private int updateTable(int start, int limit)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            var tabela = pesquisar.GetInterval(start, end);
-
-            DataTable dt = new DataTable();
-            dt.Load(tabela);
-
-            Console.WriteLine($"start = {start} /// end = {end}");
-            Console.WriteLine($"res length: {dt.Rows.Count}\n");
+            DataTable dt = pesquisar.GetInterval(start, limit);
 
             dataGD.DataSource = dt;
             dataGD.AutoResizeColumns();
@@ -225,6 +218,13 @@ namespace CRUD_Automatico
 
                 input.Text = dataGD.Rows[idFromSelectedRow].Cells[indexOfCurrentColumn].Value.ToString();
             }
+
+            DesativateInputs();
+            DesactivateButtons();
+            inptConfirmarPesquisa.Visible = false;
+            inptEditar.Visible = true;
+            inptCancelar.Visible = true;
+            inptConfirmarRemover.Visible = true;
         }
 
 
@@ -253,19 +253,19 @@ namespace CRUD_Automatico
 
 
         // muda os inputs para permitir a pesquisa por ID
-        private void modoPesquisa()
+        private void SearchMode()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.setReadOnly(!i.isId);
             }
-            desativarBotoes();
+            DesactivateButtons();
             inptConfirmarPesquisa.Visible = true;
             inptCancelar.Visible = true;
         }
 
         // Pesquisa baseado no id fornecido
-        private void pesquisar()
+        private void Search()
         {
             AutoCrud p = new AutoCrud(new MySqlConnection(BDInfo.Server));
 
@@ -276,10 +276,10 @@ namespace CRUD_Automatico
             }
 
             int id;
-            if (!int.TryParse(idSelecionado(), out id))
+            if (!int.TryParse(SelectedId(), out id))
             {
                 MessageBox.Show("ID inválido");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
@@ -288,14 +288,14 @@ namespace CRUD_Automatico
             if (row == null)
             {
                 MessageBox.Show("Funcionario não encontrado: erro");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
             if (row.Count == 0)
             {
                 MessageBox.Show("Funcionario não encontrado: sem dados");
-                limparInputs();
+                ClearInputs();
                 return;
             }
 
@@ -304,8 +304,8 @@ namespace CRUD_Automatico
                 i.Text = row[0][i.Column].ToString();
             }
 
-            desativarInputs();
-            desativarBotoes();
+            DesativateInputs();
+            DesactivateButtons();
             inptConfirmarPesquisa.Visible = false;
             inptEditar.Visible = true;
             inptCancelar.Visible = true;
@@ -321,13 +321,13 @@ namespace CRUD_Automatico
          */
 
         // verifica se os inputs obrigatorios foram preenchidos
-        private bool inputsPreenchidos()
+        private bool IsInputsFilleds()
         {
             for (int i = 0; i < inptPainel.Controls.Count; i++)
             {
                 InputControl inpt = (InputControl)inptPainel.Controls[i];
 
-                if (!inpt.isId)
+                if (inpt.isId)
                     continue;
 
                 if (!inpt.IsNullable && inpt.Text.Equals(string.Empty))
@@ -339,21 +339,21 @@ namespace CRUD_Automatico
             return true;
         }
 
-        private void limparInputs()
+        private void ClearInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.Text = string.Empty;
             }
         }
-        private void desativarInputs()
+        private void DesativateInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
                 i.setReadOnly(true);
             }
         }
-        private void ativarInputs()
+        private void ActivateInputs()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
@@ -361,14 +361,14 @@ namespace CRUD_Automatico
                     i.setReadOnly(false);
             }
         }
-        private void desativarBotoes()
+        private void DesactivateButtons()
         {
             inptAdicionar.Visible = false;
             inptEditar.Visible = false;
             inptRemover.Visible = false;
             inptPesquisar.Visible = false;
         }
-        private void ativarBotoes()
+        private void ActivateButtons()
         {
             inptAdicionar.Visible = true;
             inptEditar.Visible = true;
@@ -384,7 +384,7 @@ namespace CRUD_Automatico
             }
             return false;
         }
-        private string idSelecionado()
+        private string SelectedId()
         {
             foreach (InputControl i in inptPainel.Controls)
             {
@@ -395,29 +395,41 @@ namespace CRUD_Automatico
 
         private void button1_Click(object sender, EventArgs e)
         {
-            paginationStart = paginationEnd;
-            // +1 para ter a certeza q qnd retornar um numero de elementos igual
-            // a PAGINATION_SIZE, seja realmente o final da tabela
-            paginationEnd += PAGINATION_SIZE + 1; 
+            paginationStart += PAGINATION_SIZE;
             ButtonPreviousPage.Enabled = true;
 
-            int numberOfRows = updateTable(paginationStart, paginationEnd);
+            int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
             
-            if(numberOfRows <= PAGINATION_SIZE)
+            if(numberOfRows < PAGINATION_SIZE)
                 ButtonNextPage.Enabled = false;
+            
+            PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) +1}";
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            paginationEnd = paginationStart;
-            paginationStart = paginationStart - PAGINATION_SIZE > 0 ? paginationStart - PAGINATION_SIZE -1 : 0;
+            paginationStart = paginationStart - PAGINATION_SIZE >= 0
+                ? paginationStart - PAGINATION_SIZE 
+                : 0;
 
-            if (paginationStart <= PAGINATION_SIZE/2)
+            if (paginationStart < PAGINATION_SIZE)
                 ButtonPreviousPage.Enabled = false;
 
-            updateTable(paginationStart, paginationEnd);
-            
             ButtonNextPage.Enabled = true;
+
+            updateTable(paginationStart, PAGINATION_SIZE);
+
+            PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) + 1}";
+        }
+
+        private void PageNumerator_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+
+            
         }
     }
 }
