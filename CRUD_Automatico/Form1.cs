@@ -8,7 +8,7 @@ namespace CRUD_Automatico
 {
     public partial class Form1 : Form
     {
-        const int PAGINATION_SIZE = 10;
+        const int PAGINATION_SIZE = 1;
         int paginationStart = 0;
 
         Dictionary<string, InputControl> Name_InputsPair = new Dictionary<string, InputControl>();
@@ -184,6 +184,7 @@ namespace CRUD_Automatico
         private int updateTable(int start, int limit)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            Console.WriteLine("start: " +start);
             DataTable dt = pesquisar.GetInterval(start, limit);
 
             dataGD.DataSource = dt;
@@ -402,7 +403,9 @@ namespace CRUD_Automatico
             
             if(numberOfRows < PAGINATION_SIZE)
                 ButtonNextPage.Enabled = false;
-            
+
+            Console.WriteLine("next " + numberOfRows);
+
             PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) +1}";
         }
 
@@ -417,19 +420,34 @@ namespace CRUD_Automatico
 
             ButtonNextPage.Enabled = true;
 
-            updateTable(paginationStart, PAGINATION_SIZE);
+            int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
+
+            if (numberOfRows < PAGINATION_SIZE)
+                ButtonNextPage.Enabled = false;
+
+            Console.WriteLine("prev " + numberOfRows);
 
             PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) + 1}";
         }
 
         private void PageNumerator_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            if ( !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) )
             {
                 e.Handled = true;
             }
+            if( e.KeyChar == 13  )
+            {
+                int num;
 
-            
+                if (PageNumerator.Text.Equals(string.Empty) || int.Parse(PageNumerator.Text) == 0)
+                    num = 1;
+                else
+                    num = int.Parse(PageNumerator.Text);
+
+                PageNumerator.Text = $"{PAGINATION_SIZE * num}";
+                int numberOfRows = updateTable(PAGINATION_SIZE * num -1, PAGINATION_SIZE);
+            }
         }
     }
 }

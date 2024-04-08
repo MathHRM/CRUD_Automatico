@@ -168,7 +168,6 @@
             // 
             this.PageNumerator.Location = new System.Drawing.Point(654, 475);
             this.PageNumerator.Name = "PageNumerator";
-            this.PageNumerator.ReadOnly = true;
             this.PageNumerator.Size = new System.Drawing.Size(26, 20);
             this.PageNumerator.TabIndex = 12;
             this.PageNumerator.Text = "1";
