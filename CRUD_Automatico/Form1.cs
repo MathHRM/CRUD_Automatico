@@ -8,7 +8,7 @@ namespace CRUD_Automatico
 {
     public partial class Form1 : Form
     {
-        const int PAGINATION_SIZE = 1;
+        const int PAGINATION_SIZE = 2;
         int paginationStart = 0;
 
         Dictionary<string, InputControl> Name_InputsPair = new Dictionary<string, InputControl>();
@@ -19,7 +19,7 @@ namespace CRUD_Automatico
             var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
             testaConexao.TestaConexao();
             defineInputs();
-            updateTable(paginationStart, PAGINATION_SIZE);
+            UpdateTableAndPageButtons(paginationStart, PAGINATION_SIZE);
 
             inptCancelar.Visible = false;
             inptConfirmarEdicao.Visible = false;
@@ -60,7 +60,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart, PAGINATION_SIZE);
+            UpdateTableAndPageButtons(paginationStart, PAGINATION_SIZE);
             ClearInputs();
         }
 
@@ -117,7 +117,7 @@ namespace CRUD_Automatico
 
             ActivateButtons();
             ClearInputs();
-            updateTable(paginationStart, PAGINATION_SIZE);
+            UpdateTableAndPageButtons(paginationStart, PAGINATION_SIZE);
         }
 
         // Remover
@@ -140,7 +140,7 @@ namespace CRUD_Automatico
                 return;
             }
 
-            updateTable(paginationStart ,PAGINATION_SIZE);
+            UpdateTable(paginationStart ,PAGINATION_SIZE);
 
             ClearInputs();
             ActivateButtons();
@@ -181,16 +181,34 @@ namespace CRUD_Automatico
          */
 
         // mostra os dados da tabela
-        private int updateTable(int start, int limit)
+        private int UpdateTable(int start, int limit)
         {
             AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            Console.WriteLine("start: " +start);
             DataTable dt = pesquisar.GetInterval(start, limit);
+
+            int tableLength = dt.Rows.Count;
+
+            if (tableLength <= 0)
+                return tableLength;
 
             dataGD.DataSource = dt;
             dataGD.AutoResizeColumns();
 
-            return dt.Rows.Count;
+            return tableLength;
+        }
+
+        private void UpdateTableAndPageButtons(int start, int limit)
+        {
+            int numberOfRows = UpdateTable(start, limit);
+            
+            ButtonPreviousPage.Enabled = true;
+            ButtonNextPage.Enabled = true;
+
+            if (paginationStart < PAGINATION_SIZE)
+                ButtonPreviousPage.Enabled = false;
+
+            if (numberOfRows < PAGINATION_SIZE)
+                ButtonNextPage.Enabled = false;
         }
 
         // muda os dados quando clicado na linha
@@ -396,57 +414,51 @@ namespace CRUD_Automatico
 
         private void button1_Click(object sender, EventArgs e)
         {
+            int numberOfRows = UpdateTable(paginationStart + PAGINATION_SIZE, PAGINATION_SIZE);
+            if (numberOfRows == 0) 
+            {
+                ButtonNextPage.Enabled = false;
+                return;
+            }
+
             paginationStart += PAGINATION_SIZE;
             ButtonPreviousPage.Enabled = true;
-
-            int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
-            
-            if(numberOfRows < PAGINATION_SIZE)
-                ButtonNextPage.Enabled = false;
-
-            Console.WriteLine("next " + numberOfRows);
 
             PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) +1}";
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            paginationStart = paginationStart - PAGINATION_SIZE >= 0
+            int start = paginationStart - PAGINATION_SIZE >= 0
                 ? paginationStart - PAGINATION_SIZE 
                 : 0;
 
-            if (paginationStart < PAGINATION_SIZE)
-                ButtonPreviousPage.Enabled = false;
-
+            UpdateTable(start, PAGINATION_SIZE);
+            
+            paginationStart = start;
             ButtonNextPage.Enabled = true;
 
-            int numberOfRows = updateTable(paginationStart, PAGINATION_SIZE);
+            if( start <= 0)
+                ButtonPreviousPage.Enabled = false;
 
-            if (numberOfRows < PAGINATION_SIZE)
-                ButtonNextPage.Enabled = false;
-
-            Console.WriteLine("prev " + numberOfRows);
-
-            PageNumerator.Text = $"{(paginationStart / PAGINATION_SIZE) + 1}";
+            PageNumerator.Text = ((paginationStart / PAGINATION_SIZE) + 1).ToString();
         }
 
         private void PageNumerator_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if ( !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) )
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
             }
-            if( e.KeyChar == 13  )
+            if (e.KeyChar == 13) // enter key
             {
                 int num;
+                bool parsed = int.TryParse(PageNumerator.Text, out num);
 
-                if (PageNumerator.Text.Equals(string.Empty) || int.Parse(PageNumerator.Text) == 0)
+                if (!parsed || num <= 0)
                     num = 1;
-                else
-                    num = int.Parse(PageNumerator.Text);
 
-                PageNumerator.Text = $"{PAGINATION_SIZE * num}";
-                int numberOfRows = updateTable(PAGINATION_SIZE * num -1, PAGINATION_SIZE);
+                UpdateTableAndPageButtons(PAGINATION_SIZE * (num-1), PAGINATION_SIZE);
             }
         }
     }
