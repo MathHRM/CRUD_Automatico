@@ -8,6 +8,8 @@ namespace CRUD_Automatico
 {
     public partial class Form1 : Form
     {
+        MySqlConnection conn = new MySqlConnection( BDInfo.Server );
+
         const int PAGINATION_SIZE = 2;
         int paginationStart = 0;
 
@@ -16,7 +18,7 @@ namespace CRUD_Automatico
         public Form1()
         {
             InitializeComponent();
-            var testaConexao = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            var testaConexao = new AutoCrud( conn );
             testaConexao.TestaConexao();
             defineInputs();
             UpdateTableAndPageButtons(paginationStart, PAGINATION_SIZE);
@@ -52,7 +54,7 @@ namespace CRUD_Automatico
                     values.Add(i.Column, i.Text);
             }
 
-            adicionar = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            adicionar = new AutoCrud( conn );
             bool adicionado = adicionar.Add(values);
             if (!adicionado)
             {
@@ -103,7 +105,7 @@ namespace CRUD_Automatico
 
             int id = int.Parse(stringId);
 
-            AutoCrud update = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            AutoCrud update = new AutoCrud( conn );
             bool atualizado = update.Update(values, id);
 
             if (!atualizado)
@@ -132,7 +134,7 @@ namespace CRUD_Automatico
         {
             int id = int.Parse(SelectedId());
 
-            AutoCrud excluir = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            AutoCrud excluir = new AutoCrud( conn );
             bool removido = excluir.Remove(id);
             if (!removido)
             {
@@ -183,7 +185,7 @@ namespace CRUD_Automatico
         // mostra os dados da tabela
         private int UpdateTable(int start, int limit)
         {
-            AutoCrud pesquisar = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            AutoCrud pesquisar = new AutoCrud( conn );
             DataTable dt = pesquisar.GetInterval(start, limit);
 
             int tableLength = dt.Rows.Count;
@@ -251,18 +253,18 @@ namespace CRUD_Automatico
         // adiciona os inputs baseado nas colunas da tabela
         private void defineInputs()
         {
-            AutoCrud c = new AutoCrud(new MySqlConnection(BDInfo.Server));
-            var colunas = c.GetColumnsInformations();
+            AutoCrud a = new AutoCrud( conn );
+            var columnInfoPair = a.GetColumnsInformations();
 
-            if(colunas == null)
+            if(columnInfoPair == null)
             {
                 MessageBox.Show("Erro ao exibir inputs");
                 return;
             }
 
-            foreach (var nomeCol in colunas.Keys)
+            foreach (var nomeCol in columnInfoPair.Keys)
             {
-                InputControl input = new InputControl(colunas[nomeCol]);
+                InputControl input = new InputControl(columnInfoPair[nomeCol]);
 
                 Name_InputsPair.Add( nomeCol, input );
                 inptPainel.Controls.Add(input);
@@ -276,7 +278,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.setReadOnly(!i.isId);
+                i.IsEnabled = i.isId;
             }
             DesactivateButtons();
             inptConfirmarPesquisa.Visible = true;
@@ -286,7 +288,7 @@ namespace CRUD_Automatico
         // Pesquisa baseado no id fornecido
         private void Search()
         {
-            AutoCrud p = new AutoCrud(new MySqlConnection(BDInfo.Server));
+            AutoCrud p = new AutoCrud( conn );
 
             if (IsIdInputEmpty())
             {
@@ -369,7 +371,7 @@ namespace CRUD_Automatico
         {
             foreach (InputControl i in inptPainel.Controls)
             {
-                i.setReadOnly(true);
+                i.IsEnabled = false;
             }
         }
         private void ActivateInputs()
@@ -377,7 +379,7 @@ namespace CRUD_Automatico
             foreach (InputControl i in inptPainel.Controls)
             {
                 if (!i.isId)
-                    i.setReadOnly(false);
+                    i.IsEnabled = true;
             }
         }
         private void DesactivateButtons()

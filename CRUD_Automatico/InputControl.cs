@@ -22,6 +22,18 @@ namespace CRUD_Automatico
 
         public bool MascaraCompleta { get { return inpt.MaskFull; } }
 
+        public bool IsEnabled
+        {
+            get
+            {
+                return Input.Enabled;
+            }
+            set
+            {
+                Input.Enabled = value;
+            }
+        }
+
 
         public InputControl(string col)
         {
@@ -41,7 +53,7 @@ namespace CRUD_Automatico
             if (col.IsKey)
             {
                 this.isId = true;
-                setReadOnly(true);
+                this.IsEnabled = false;
             }
 
             if (col.IsNullable)
@@ -66,11 +78,6 @@ namespace CRUD_Automatico
                 inpt.Mask = "00/00/0000";
                 return;
             }
-        }
-
-        public void setReadOnly(bool enabled)
-        {
-            Input.Enabled = !enabled;
         }
 
         public void setMask(string mask)

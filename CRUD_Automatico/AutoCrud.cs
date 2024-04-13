@@ -258,27 +258,26 @@ namespace CRUD_Automatico
         // retorna um dicionario com o nome e dados de todas as colunas
         public Dictionary<string, MySqlColumn> GetColumnsInformations()
         {
+            Dictionary<string, MySqlColumn> colunas = new Dictionary<string, MySqlColumn>();
+
+            var schemaCommand = new MySqlCommand(
+                $"select " +
+                $"COLUMN_NAME, " +
+                $"IS_NULLABLE, " +
+                $"COLUMN_KEY, " +
+                $"DATA_TYPE, " +
+                $"EXTRA " +
+                $"from information_schema.columns " +
+                $"WHERE TABLE_NAME = @TableName " +
+                $"AND TABLE_SCHEMA = @TableSchema;",
+               _conxSql);
+
+            schemaCommand.Parameters.AddWithValue("@TableName", BDInfo.Table);
+            schemaCommand.Parameters.AddWithValue("@TableSchema", BDInfo.DataBase);
+
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                Dictionary<string, MySqlColumn> colunas = new Dictionary<string, MySqlColumn>();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select " +
-                    $"COLUMN_NAME, " +
-                    $"IS_NULLABLE, " +
-                    $"COLUMN_KEY, " +
-                    $"DATA_TYPE, " +
-                    $"EXTRA " +
-                    $"from information_schema.columns " +
-                    $"WHERE TABLE_NAME = @TableName " +
-                    $"AND TABLE_SCHEMA = @TableSchema;",
-                   _conxSql);
-
-                schemaCommand.Parameters.AddWithValue("@TableName", BDInfo.Table);
-                schemaCommand.Parameters.AddWithValue("@TableSchema", BDInfo.DataBase);
+                _conxSql.Open();
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -292,6 +291,7 @@ namespace CRUD_Automatico
 
                     colunas.Add(nome, new MySqlColumn(nome, nullable, dataType, key, extra));
                 }
+
                 reader.Close();
 
                 return colunas;
@@ -310,16 +310,15 @@ namespace CRUD_Automatico
         // retorna uma lista com o nome de todas as colunas
         public List<string> GetColumnNames()
         {
+            List<string> list = new List<string>();
+
+            var schemaCommand = new MySqlCommand(
+                $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';",
+               _conxSql);
+
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                List<string> list = new List<string>();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}';",
-                   _conxSql);
+                _conxSql.Open();
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -346,14 +345,13 @@ namespace CRUD_Automatico
         // retorna os dados da coluna pelo nome
         public MySqlColumn GetColumnInformation(string col)
         {
+            var schemaCommand = new MySqlCommand(
+                $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_NAME = {col};",
+               _conxSql);
+
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME, IS_NULLABLE, COLUMN_KEY, DATA_TYPE, EXTRA from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_NAME = {col};",
-                   _conxSql);
+                _conxSql.Open();
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -383,14 +381,13 @@ namespace CRUD_Automatico
         // retorna em string o data type da coluna
         private string GetColumnType(string col)
         {
+            var schemaCommand = new MySqlCommand(
+                $"select DATA_TYPE from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_NAME = '{col}';",
+               _conxSql);
+
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select DATA_TYPE from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_NAME = '{col}';",
-                   _conxSql);
+                _conxSql.Open();
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -414,14 +411,13 @@ namespace CRUD_Automatico
         // retorna o nome da coluna id (chave primaria)
         private string GetTheIdColumn()
         {
+            var schemaCommand = new MySqlCommand(
+                $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_KEY = 'PRI';",
+               _conxSql);
+
             try
             {
-                if (_conxSql.State != ConnectionState.Open)
-                    _conxSql.Open();
-
-                var schemaCommand = new MySqlCommand(
-                    $"select COLUMN_NAME from information_schema.columns WHERE TABLE_NAME = '{BDInfo.Table}' AND TABLE_SCHEMA = '{BDInfo.DataBase}' AND COLUMN_KEY = 'PRI';",
-                   _conxSql);
+                _conxSql.Open();
 
                 var reader = schemaCommand.ExecuteReader();
 
@@ -451,10 +447,10 @@ namespace CRUD_Automatico
         // muda o formato da data brasileira (dd/MM/aaaa) para americana (aaaa/MM/dd)
         public string ChangeDateFormat(string date)
         {
-            if (date.Length < 11)
-                return DateTime.Parse(date).ToString("yyyy/MM/dd");
-            else
+            if (date.Length > 10)
                 return DateTime.Parse(date).ToString("yyyy/MM/dd HH:mm:ss");
+
+            return DateTime.Parse(date).ToString("yyyy/MM/dd");
         }
 
         public bool TestaConexao()
